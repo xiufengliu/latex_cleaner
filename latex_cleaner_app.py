@@ -3,9 +3,9 @@ import os
 import shutil
 import subprocess
 import re
-import time
 from arxiv_latex_cleaner.arxiv_latex_cleaner import run_arxiv_cleaner
 
+# Helper function to create arguments for arxiv_latex_cleaner
 def make_args(input_folder, resize_images=False, im_size=500, compress_pdf=False, pdf_im_resolution=500, images_allowlist=None, commands_to_delete=None, use_external_tikz=None, keep_bib=False):
     if images_allowlist is None:
         images_allowlist = {}
@@ -24,18 +24,24 @@ def make_args(input_folder, resize_images=False, im_size=500, compress_pdf=False
     }
     return args
 
+# Clean up temporary directories
 def clean_temp_dirs(directories):
     for directory in directories:
         if os.path.exists(directory):
             shutil.rmtree(directory)
 
-def show_progress_bar(duration):
-    with st.spinner('Converting...'):
-        progress_bar = st.progress(0)
-        for i in range(1, 101):
-            progress_bar.progress(i)
-            time.sleep(duration / 100.0)
+# Deep clean LaTeX by removing appendices and references
+def deep_clean_latex(latex_code):
+    # Patterns to detect the start of appendices or references
+    patterns = [r'\\appendix', r'\\bibliography\{', r'\\begin\{thebibliography\}']
+    lines = latex_code.split('\n')
+    for i, line in enumerate(lines):
+        if any(re.search(pattern, line) for pattern in patterns):
+            # Truncate document and ensure it ends properly
+            return '\n'.join(lines[:i]) + '\n\\end{document}'
+    return latex_code
 
+# Streamlit app configuration
 st.set_page_config(
     page_title="Latex Cleaner",
     page_icon="🧊",
@@ -63,8 +69,13 @@ with st.expander("LaTeX Cleaner", expanded=True):
     TMP_DIR = os.path.join(BASE_DIR, 'tmp_latex_project')
     OUTPUT_DIR = os.path.join(BASE_DIR, 'tmp_latex_project_arXiv')
 
+    # Input LaTeX code
     latex_content = st.text_area("Paste your LaTeX code here:", height=400)
+
+    # Deep clean option
     deep_clean = st.checkbox("Deep Clean (keep only title, abstract, and main text)")
+
+    # Output format selection
     output_format = st.radio("Choose output format:", ["LaTeX", "TXT", "HTML"])
 
     if st.button("Submit"):
@@ -90,15 +101,7 @@ with st.expander("LaTeX Cleaner", expanded=True):
 
             # Apply deep cleaning if selected
             if deep_clean:
-                patterns = [r'\\appendix', r'\\bibliography\{', r'\\begin\{thebibliography\}']
-                lines = cleaned_latex.split('\n')
-                truncate_line = None
-                for i, line in enumerate(lines):
-                    if any(re.search(pattern, line) for pattern in patterns):
-                        truncate_line = i
-                        break
-                if truncate_line is not None:
-                    cleaned_latex = '\n'.join(lines[:truncate_line]) + '\n\\end{document}'
+                cleaned_latex = deep_clean_latex(cleaned_latex)
 
             # Write the final cleaned LaTeX to the output file
             with open(os.path.join(OUTPUT_DIR, 'input.tex'), 'w') as f:
@@ -124,6 +127,7 @@ with st.expander("LaTeX Cleaner", expanded=True):
                 tex_content = tex_content.replace('\\end{abstract}', '')
                 with open(os.path.join(OUTPUT_DIR, 'input.tex'), 'w') as f:
                     f.write(tex_content)
+                # Run Pandoc conversion
                 subprocess.run(['pandoc', '-s', os.path.join(OUTPUT_DIR, 'input.tex'), '-o', os.path.join(OUTPUT_DIR, 'output.html'), '--mathjax'])
                 with open(os.path.join(OUTPUT_DIR, 'output.html'), 'r') as f:
                     html_text = f.read()
