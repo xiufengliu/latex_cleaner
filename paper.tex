@@ -1,0 +1,1220 @@
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+% \usepackage{enumitem}
+\usepackage{array}
+%\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{nomencl}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+	T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{balance}
+
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+%\usepackage{algpseudocode}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{bm}
+% \usepackage{ulem}
+%\usepackage[usenames]{color}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{glossaries}
+\usepackage[switch]{lineno}
+\usepackage{lscape}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{rotating}
+\usepackage{arydshln} 
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage[tight,footnotesize]{subfigure}
+\usepackage[colorlinks,linkcolor=red,anchorcolor=green,citecolor=blue]{hyperref}
+
+\newtheorem{definition}{\textbf{Definition}}[section]
+
+\definecolor{tableyellow}{rgb}{1, 0.949, 0.8}
+\definecolor{tablegreen}{rgb}{0.886, 0.937, 0.855}
+\definecolor{tablegray}{rgb}{0.929, 0.929, 0.929}
+\definecolor{tableblue}{rgb}{0.878, 0.957, 1}
+
+\newcommand{\cmark}{\textcolor{green}{\ding{52}}}
+\newcommand{\xmark}{\textcolor{red}{\ding{55}}}
+
+\newcommand{\hl}[1]{\textcolor{blue}{#1}}
+
+\makenomenclature
+\begin{document}
+%\title{Causality-Aware Dynamic Multi-Graph Convolutional Networks for Load Forecasting of Electric Vehicle Charging Stations}
+\title{Causality-Aware Dynamic Multi-Graph Convolutional Networks with Critical Node Modeling for Load Forecasting of Electric Vehicle Charging Stations}
+
+\author{Yaohui Huang, \IEEEmembership{Student Member, IEEE}, Senzhen Wu, Zhijin Wang, Xiufeng Liu, Chendan Li and Yue Hu\vspace{-28pt}
+	% \thanks{This paragraph of the first footnote will contain the date on 
+		% which you submitted your paper for review. It will also contain support 
+		% information, including sponsor and financial support acknowledgment. For 
+		% example, ``This work was supported in part by the U.S. Department of 
+		% Commerce under Grant BS123456.'' }
+	\thanks{This work was partly supported by the BEGONIA project (No. 01133306) under European Commission under grant agreement. (Corresponding authors: Zhijin Wang and Xiufeng Liu.) (zhijinecnu@gmail.com, xiuli@dtu.dk)}
+	% \thanks{Yaohui Huang is with the School of Automation, Central South University, 410083 Changsha, China (yhhuang5212@gmail.com).}
+	% \thanks{Senzhen Wu, Yue Hu, and Zhijin Wang are with the College of Computer Engineering, Jimei University, 361021 Xiamen, China (szwbyte@gmail.com, yuehu.xm@gmail.com, zhijinecnu@gmail.cn).}\thanks{Xiufeng Liu is with the Department of Technology, Management and Economics, Technical University of Denmark, 2800 Kgs. Lyngby, Denmark (xiuli@dtu.dk).}
+	% \thanks{Chendan  Li is with DITEN, University of Genoa, Genova, Italy (chendan.li@diten.unige.it).}
+	\thanks{Yaohui Huang is with the School of Automation, Central South University, 410083 Changsha, China. Senzhen Wu, Yue Hu, and Zhijin Wang are with the College of Computer Engineering, Jimei University, 361021 Xiamen, China. Xiufeng Liu is with the Department of Technology, Management and Economics, Technical University of Denmark, 2800 Kgs. Lyngby, Denmark. Chendan Li is with DITEN, University of Genoa, Genova, Italy.}
+	}
+
+
+% \author{IEEE Publication Technology Department
+	% \thanks{Manuscript created October, 2020; This work was developed by the IEEE Publication Technology Department. This work is distributed under the \LaTeX \ Project Public License (LPPL) ( http://www.latex-project.org/ ) version 1.3. A copy of the LPPL, version 1.3, is included in the base \LaTeX \ documentation of all distributions of \LaTeX \ released 2003/12/01 or later. The opinions expressed here are entirely that of the author. No warranty is expressed or implied. User assumes all risk.}}
+
+\markboth{Journal of \LaTeX\ Class Files,~Vol.~18, No.~9, September~2020}%
+{How to Use the IEEEtran \LaTeX \ Templates}
+
+\maketitle
+\begin{abstract}
+Accurately forecasting the load of electric vehicle charging stations (EVCSs) is crucial for optimizing grid operations and facilitating EV integration, yet existing methods struggle to capture the intricate spatio-temporal dependencies and the impact of influential EVCSs within charging networks. To address this, we propose a novel framework, Causality-Aware Dynamic Multi-Graph Convolutional Network (CADGN), a multi-graph convolutional network that integrates causal inference and critical node modeling. It consists of two core modules: the Causality-Aware Graph Learning Module (CAGLM) uncovers and represents causal relationships between EVCSs, while the Critical Relationship Graph Learning Module (CRGLM) dynamically models the evolving connections among critical EVCS nodes. Temporal patterns extracted from these modules are then fused to generate accurate load predictions. Extensive experiments using real-world datasets of hourly charging data from multiple cities demonstrate CADGN's superiority over state-of-the-art EVCS load forecasting models, particularly for short-term and mid-term horizons. Notably, our model achieves an average 4.7\% reduction in Mean Absolute Error (MAE) compared to Graph WaveNet across all datasets and prediction horizons, highlighting the practical benefits of considering both causal and critical relationships for enhanced grid operations and EV integration. These results emphasize the importance of incorporating causality and the identification of critical relationships in the EVCS load forecast to achieve higher accuracy.
+\end{abstract}
+
+\begin{IEEEkeywords} 
+	Electric Vehicle Charging Stations,
+	Load Forecasting,
+	Graph Convolutional Networks,
+	Causal Inference,
+	Time Series Analysis\vspace{-18pt}
+\end{IEEEkeywords}
+
+\printnomenclature
+
+% \nomenclature{EVCS}{Electric Vehicle Charging Stations}
+% \nomenclature{CADGN}{Causality-Aware Dynamic Multi-Graph Convolutional Network}
+% \nomenclature{CAGLM}{Causality-Aware Graph Learning Module}
+% \nomenclature{CRGLM}{Critical Relationship Graph Learning Module}
+% \nomenclature{MAE}{Mean Absolute Error}
+% \nomenclature{RMSE}{Root Mean Squared Error}
+% \nomenclature{MAPE}{Mean Absolute Percentage Error}
+% \nomenclature{GNN}{Graph Neural Network}
+% \nomenclature{SGCN}{Stacked Graph Convolutional Network}
+% \nomenclature{TFGES}{Time-Fragment Greedy Equivalence Search}
+% \nomenclature{MSE}{Mean Squared Error}
+% \nomenclature{MLP}{Multilayer Perceptron}
+% \nomenclature{TRFM}{Temporal Representation Fusion Module}
+
+% \nomenclature{$\mathcal{L}_{cv}(\mathcal{G}'; \tilde{\bm{X}})$}{Cross-validated likelihood score of graph $\mathcal{G}'$ given normalized data $\tilde{\bm{X}}$}
+% \nomenclature{$N_Q$}{Number of cross-validation folds}
+% \nomenclature{$\tilde{\bm{X}}^{(q)}$}{Normalized data segment in fold $q$}
+% \nomenclature{$pa(v_i, \mathcal{G}')$}{Parents of node $v_i$ in graph $\mathcal{G}'$}
+% % \nomenclature{$\lambda$}{Regularization parameter}
+% \nomenclature{$N_T$}{Number of historical time steps for review window}
+% \nomenclature{$N_S$}{Number of EVCSs}
+% \nomenclature{$N_P$}{Predictive step size}
+% \nomenclature{$\bm{X}^{(t_{e})}$}{Historical load data up to time step $t_{e}$}
+% \nomenclature{$X^{(t)}$}{Load vector at time step $t$}
+% \nomenclature{$\mathcal{G}$}{EVCS load network graph}
+% \nomenclature{$\bm{V}$}{Set of nodes in the EVCS load network}
+% \nomenclature{$\bm{E}$}{Set of edges in the EVCS load network}
+% \nomenclature{$\bm{A}$}{Adjacency matrix of the EVCS load network}
+% \nomenclature{$\bm{C}_{cr}$}{Set of critical nodes in the EVCS load network}
+% \nomenclature{$\bm{\mathcal{G}}_{cr}$}{Critical relationship graph}
+% \nomenclature{$\bm{H}^{(l)}$}{Node feature matrix at layer $l$}
+% \nomenclature{$\bm{W}^{(l)}$}{Trainable weights at layer $l$}
+% \nomenclature{$\bm{H}_{ca}^{(o)}$}{Output representation from CAGLM}
+% \nomenclature{$\bm{H}_{cr}^{(o)}$}{Output representation from CRGLM}
+% \nomenclature{$\mathcal{L}_{total}(\Theta)$}{Mean Squared Error (MSE) loss function for model parameters $\Theta$}
+% \nomenclature{$\mathbb{F}(\cdot)$}{Mapping function for load prediction}
+% % \nomenclature{$\epsilon$}{Small constant to prevent division by zero}
+
+\section{Introduction}
+\label{sec:intr}
+\subsection{Background and Motivation}
+The widespread adoption of electric vehicles (EVs) is rapidly transforming transportation systems, offering promising solutions to reduce carbon emissions and dependency on fossil fuels. However, the increasing demand for electricity from EV charging poses significant challenges to the stability and efficient power management of the electric grid \cite{journal/natenergy2022/7Powell}.  Electric Vehicle Charging Stations (EVCS), playing a pivotal role in facilitating this transition to electric mobility, necessitate accurate and robust load forecasting techniques to predict future electricity demands and ensure a reliable and sustainable charging infrastructure \cite{journal/tsg2023/Jiang}.  Accurate EVCS load forecasts provide invaluable information for various stakeholders in the power system, enabling informed decisions in grid operations, planning, and market management.  For grid operators, precise load predictions are essential for mitigating peak demand stress and optimally scheduling generation and distribution resources to meet EV charging requirements effectively. In planning and investment decisions, reliable forecasts serve as critical inputs for infrastructure expansions and upgrades, ensuring adequate capacity and resilience for supporting the growing EV fleet. \hl{Moreover, for EVCS operators, accurate load forecasts support strategic decisions on infrastructure investments, enabling optimal placement and capacity of charging stations to enhance profitability and customer satisfaction. In smart grid systems with dynamic pricing, forecasting plays a critical role in offering consumers personalized charging cost insights, encouraging behavior shifts that flatten demand peaks and reduce operational costs \cite{zheng2024effects}. Additionally, accurate forecasting allows operators to fine-tune pricing strategies, maximizing profits during high-demand periods while keeping costs affordable during off-peak times.  These advancements contribute to both business sustainability and grid efficiency, driving broader adoption of EVs and expanding the economic viability of EV charging networks \cite{nezamuddin2021problem}. }
+
+ The inherent challenge in EVCS load forecasting arises from the complex interplay of spatial and temporal factors governing charging patterns \cite{9809785}.  Spatially, EVCS load demands exhibit inherent dependencies, with nearby stations often experiencing correlated fluctuations due to factors such as user mobility patterns, proximity to popular destinations, and regional transportation networks. Temporally, EVCS loads demonstrate distinct periodicities influenced by daily and weekly routines, socioeconomic patterns, and charging behavior variability, encompassing both long-term (seasonal) and short-term (hourly or sub-hourly) variations \cite{khan2023comparison}.  While traditional time series forecasting methods have been applied to address EVCS load forecasting \cite{journal/tte2024/10Wu}, they struggle to model the rich spatial interdependencies between charging stations, often neglecting crucial information relevant to capturing the intricate dynamics of network-level EVCS load patterns. To capture the inherent relationships between charging station loads, Graph Neural Networks (GNNs) have gained significant traction due to their ability to model and learn on complex graph structures \cite{conference/nips2020/33bai}. By explicitly encoding EVCS spatial relationships into the model's architecture, GNNs provide a powerful framework for capturing complex spatio-temporal interactions and achieving higher prediction accuracy \cite{journal/tsg2024/15Kim}. 
+
+ The above-mentioned are not the only factors that affect the charging load dynamics. While GNN-based models show great potential for capturing these spatio-temporal relationships, most existing approaches treat all EVCS nodes (charging stations) and their interconnections uniformly during representation learning, overlooking two crucial aspects that limit their forecasting accuracy. First, they do not differentiate between correlations and true causal relationships, potentially leading to less robust and interpretable predictions, particularly as the network dynamics evolve \cite{yi2024fouriergnn}. Fig. \ref{fig:difference} highlights this distinction by contrasting the structure of a causal graph against a correlation graph for EVCS loads. 
+ \hl{The \textbf{causal graph} is driven by specific events or behavioral changes, such as short-term station service interruptions or pricing adjustments, which result in user transfers between stations and subsequently impact station load dynamics. This forms a clear directional causal chain. As shown in Fig. \ref{fig:difference}(a), when station $v_2$ halts some of its charging services, users are forced to shift to stations $v_1$ and $v_4$. However, the excessive load at $v_1$ and $v_4$ further leads to an increase in demand at station $v_3$.
+In contrast, the \textbf{correlation graph} is driven by overarching systemic trends, such as time-based or regional demand patterns. The relationships between variables are predominantly influenced by common external factors. As illustrated in Fig. \ref{fig:difference}(b), variations in load are attributed to shared factors, such as daytime or nighttime traffic flow and demand patterns, but without a clearly defined causal pathway. Furthermore, beyond direct causal effects, more complex mechanisms also influence load dynamics, including joint interventions \cite{mooij2020joint}, where simultaneous changes at multiple stations trigger cascading effects, as well as mediation effects \cite{10.1145/3501714.3501736} and interaction effects \cite{imai2013identification}, where intermediate variables or interdependencies shape the overall impact.}
+Second, they fail to recognize that certain EVCS nodes can have disproportionately larger impacts on the overall network load behavior. For instance, charging stations located near transportation hubs or popular commercial areas may experience significantly higher demand and could exert a stronger influence on surrounding stations due to shifting traffic patterns and user preferences. By not explicitly identifying and leveraging the unique role of these influential ``critical'' EVCS nodes during forecasting, existing GNN methods might underutilize crucial information, leading to reduced performance and less-informed insights.
+
+\begin{figure}[t!]
+	\centering
+	\includegraphics[width=1\linewidth]{./images/r1_difference.pdf}
+	% \caption{The conceptual differences between causality graph and correlation graph for electric vehicle charging stations.}
+	\caption{\hl{Conceptual differences between causal and correlation graphs in EVCS networks. (a) Causal graphs show directed relationships where events like service interruptions cause load redistribution among stations. (b) Correlation graphs illustrate statistical associations driven by shared external factors, such as time-of-day demand patterns.}}
+	\label{fig:difference}
+    \vspace{-18pt}
+\end{figure}
+
+Motivated by considering both spatial and temporal factors from this overlayed transportation network and electrical network, as well as the significant impact of the critical nodes, we introduce CADGN, a novel framework that explicitly models both causality and the dynamics among critical nodes in EVCS load forecasting.  CADGN leverages two key modules: the Causality-Aware Graph Learning Module (CAGLM) and the Critical Relationship Graph Learning Module (CRGLM), respectively. The CAGLM infers a causality graph from the historical load data, representing cause-and-effect relationships between EVCS.  It then performs dynamic graph convolution on this causality graph to learn representations informed by the flow of causal dependencies.  Complementing the CAGLM, the CRGLM focuses on modeling the intricate dynamics among the most influential EVCS in the network. It achieves this by first identifying ``critical'' nodes – those with substantial influence on other EVCS loads based on a calculated centrality score – and then constructing a dynamic critical relationship graph representing their interconnectedness. By dynamically capturing and representing these relationships, the CRGLM extracts critical information often overlooked by conventional graph-based models. The representations learned from these modules are subsequently fused and processed through a Temporal Representation Fusion Module (TRFM) and an output layer, ultimately leading to enhanced forecasting accuracy, particularly for short-term and mid-term horizons. 
+
+\subsection{Literature Review}
+\label{sec:related_work}
+% This part reviews related research on EVCS load forecasting, introduces concepts of causality and critical node analysis in this domain, and highlights research gaps addressed by our proposed CADGN model.
+
+\subsubsection{EVCS Load Forecasting and the Application of Graph Neural Networks} 
+\label{subsec:evcs_load}
+
+\hl{Accurate prediction of EVCS load demand is paramount for ensuring efficient power grid management and successfully integrating Electric Vehicles into the existing energy infrastructure. Traditional approaches predominantly relied on classical statistical methods \cite{journal/ojvt2024/5rashid} and conventional machine learning methods \cite{journal/tte2024/10Wu} to model temporal dependencies in EVCS load patterns. 
+While these models offered simplicity and interpretability, their limited capacity to capture non-linear dependencies and inter-station interactions rendered them inadequate for complex, large-scale networks \cite{journal/tia2023/zheng}.
+The rise of deep learning, particularly in time series forecasting \cite{yaghoubi2024systematic, conference/aaai2021/11106Zhou, conference/iclr2023/zhang, conference/iclr2023/NieNSK23}, has paved the way for tackling these more intricate load prediction challenges. Zheng et al. \cite{journal/tia2023/zheng} introduced a hierarchical forecasting model using partial input convex neural networks, capturing spatial dependencies across EVCS and temporal demand dynamics. Huang et al. \cite{journal/tits2023/24huang} proposed MetaProbformer, a meta-learning-enhanced Transformer framework, effectively addressing spatial correlations and long-term temporal dependencies in charging load forecasting. Li et al. \cite{journal/tiv2023/8li} and Morteza et al. \cite{journal/tii2021/17Morteza} both presented reinforcement learning-assisted deep learning approach to handle spatial interactions and temporal uncertainties in EVCS power forecasting. 
+However, the preassumption of correlations across all EVCS may introduce extraneous complexity, noise, and redundancy, thereby limiting their predictive efficacy and scalability in complex network settings.}
+
+\hl{The advent of Graph Neural Networks (GNNs) has introduced transformative capabilities in capturing the spatiotemporal correlations inherent in EVCS networks \cite{journal/energy2023/278Wang}. Their adeptness in representing arbitrary relations and dynamically adapting to evolving graph topologies makes them a compelling choice for addressing the complexities of EVCS load forecasting \cite{journal/tkde2023/10Chen, conference/ijcai2019/1907Wu}. Several studies have demonstrated the successful application of various GNN architectures to enhance the accuracy of EVCS load forecasting \cite{journal/ojvt2024/5rashid}. Specifically, Shi et al. \cite{journal/tsg2024/shi} proposed a novel GNN-based model that leveraged spatial and temporal information, combined with carefully selected features evaluated using the maximal information coefficient, to predict EVCS load demand, achieving superior performance compared to traditional methods. Kim et al. \cite{journal/tsg2024/15Kim} introduced a parallel-structured GNN model that effectively captured multi-level spatial-temporal dependencies using a mutual adjacency matrix, demonstrating strong forecasting accuracy. Qu et al. \cite{journal/tits2024/25Qu} incorporated meta-learning with graph and temporal attention mechanisms, integrating multimodal prior knowledge to achieve superior accuracy and reliability in regional EVCS demand prediction. Li et al. \cite{journal/tpwrs2024/39Li} proposed an EGAT-LSTM model that integrates edge aggregation graph attention networks with LSTMs, further enhancing the predictive performance.
+However, Ankitha et al. \cite{journal/tpwrs2024/39Prasanna} observed that existing GNN-based models largely focus on capturing correlational patterns in load data without explicitly disentangling true cause-and-effect relationships, which can result in capturing spurious correlations and reducing the model's robustness and generalizability \cite{lan2024spatiotemporal}. Moreover, the influence of certain ``critical" EVCSs, particularly those experiencing high demand and exerting significant influence on surrounding stations, remains largely underexplored \cite{kong2024spatio}.}
+
+% Graph Neural Networks (GNNs) have emerged as powerful methods for modeling spatio-temporal dependencies in EVCS load forecasting \cite{conference/ijcai2019/1907Wu, journal/tkde2023/10Chen}. Their ability to represent intricate relationships and adapt to evolving graph structures \cite{conference/aaai2020/34Pareja} has proven effective in various energy forecasting tasks, including energy demand prediction \cite{journal/energy2023/278Wang}. Several works have shown that GNN architectures significantly enhance the accuracy of EVCS load forecasts \cite{journal/tsg2024/15Kim}. 
+
+% Recent advancements have incorporated novel mechanisms to enhance GNN-based forecasting models. Graph Attention Networks (GATs) introduce attention mechanisms that dynamically weigh the influence of neighboring nodes, thereby capturing non-uniform spatial dependencies \cite{journal/tte2024/10Wu}. Multimodal approaches have further enriched model inputs by integrating auxiliary data, such as traffic flow, weather conditions, and socio-economic factors, to capture latent variables that influence EVCS load demand \cite{liang2023effects}. Additionally, spatio-temporal feature engineering techniques, such as node centrality analysis and time-dependent graph structures, have been explored to better represent localized and global dynamics within the network \cite{massidda2023total}. Despite these efforts, there remains a lack of cohesive frameworks that unify these innovations, particularly in integrating causality and critical node dynamics.
+
+% Accurate prediction of EVCS load demand is paramount for ensuring efficient power grid management and successfully integrating Electric Vehicles into the existing energy infrastructure.  Initial work in this field frequently relied on conventional time series approaches,  with \cite{journal/tte2024/10Wu} employing the support vector regression method to model temporal dependencies in EVCS load patterns. However,  as highlighted by Zheng et al. \cite{journal/tia2023/zheng}, the increasing scale and interconnection of EVCS networks necessitate capturing the spatial relationships and potential correlated fluctuations between stations, exceeding the capabilities of traditional methods.  The rise of deep learning, especially in its application to time series forecasting \cite{yaghoubi2024systematic}, has paved the way for tackling these more intricate, large-scale load prediction challenges.
+
+% Graph neural networks have emerged as particularly promising for capturing spatio-temporal dependencies \cite{conference/ijcai2019/1907Wu, journal/tkde2023/10Chen, khoshraftar2024survey}.  Their adeptness in representing arbitrary relations,  dynamically adapting to evolving graph topologies \cite{conference/aaai2020/34Pareja}, and demonstrating success in various energy forecasting applications, including energy demand prediction \cite{10251987, journal/energy2023/278Wang}, makes them a compelling choice for addressing EVCS load forecasting complexities. 
+% Several works have showcased the successful application of various GNN architectures to improve the accuracy of EVCS load forecasting \cite{journal/tsg2024/15Kim}.  Notably, Lan et al. \cite{lan2024spatiotemporal}  presented a novel GNN architecture that explicitly encoded spatial relationships between EVCS, significantly outperforming traditional forecasting approaches and providing more accurate insights into the network-level dynamics of charging station load patterns.  
+
+% However, Ankitha et al. \cite{journal/tpwrs2024/39Prasanna} observed that existing GNN-based models in this domain largely focus on capturing correlational patterns in load data without explicitly disentangling true cause-and-effect relationships. This approach, as pointed out by Mitikiri et al. \cite{mitikiri2023modelling}, can result in capturing spurious correlations, potentially diminishing the model’s robustness and ability to generalize to new EVCS deployments or under unforeseen disruptions. Furthermore, the importance of certain “critical” EVCSs, particularly those experiencing high demand and exerting significant influence on surrounding stations, remains largely underexplored by most GNN-based methods \cite{kong2024spatio}. 
+
+\subsubsection{Beyond Correlations: The Need for Causality and Critical Node Focus in EVCS Networks} 
+\label{subsec:causal_critical}
+
+To enhance EVCS load forecasting, it is essential to transition from simply modeling statistical correlations and instead focus on understanding true cause-and-effect relationships between stations. This requires integrating causality principles, as initially proposed by Granger \cite{granger1969investigating}. Recent advancements in deep learning have shown promise in incorporating causal concepts into forecasting models, leading to improved accuracy \cite{10448031, massidda2023total}. Despite this progress, the integration of causal reasoning in EVCS load forecasting remains underexplored, presenting an opportunity to extend these approaches for greater accuracy and understanding \cite{liang2023effects}.
+
+Beyond explicitly representing causal dependencies, the recognition of critical EVCS nodes, particularly those with outsized influence on the surrounding charging patterns within a network, represents another vital area of advancement. 
+\hl{Kong et al. \cite{kong2024spatio} emphasize the importance of identifying key network components, referred to as ``influencers" or ``hubs", which play pivotal roles in driving information flow and influencing overall system dynamics.}
+In EVCS networks, stations near transportation hubs or busy commuter routes likely exert more influence on load patterns than less strategically located stations. Although research on applying critical node analysis to EVCS load forecasting is limited, related work in traffic prediction \cite{jiang2022graph} underscores the importance of these influential elements in enhancing predictive accuracy and understanding system dynamics \cite{yu2020identifying}. These studies demonstrate the advantages of incorporating critical nodes into the modeling framework. Our proposed Causality-Aware Dynamic Multi-Graph Convolutional Network (CADGN) addresses these gaps by explicitly modeling both causal relationships and the influence dynamics among critical EVCS nodes, aiming to achieve more robust and causality-aware load forecasting.
+\hl{Table \ref{tab:related_work} provides a detailed comparison analysis between existing studies in the literature and the proposed approach.}
+
+\begin{table}[t!]
+	\centering
+	\caption{\hl{Comparative analysis of existing studies and the proposed CADGN model.}}
+    \vspace{-8pt}
+	\resizebox{1\linewidth}{!}{
+		\begin{tabular}{cccccc}
+			\toprule
+			\textbf{Ref.} & \makecell[c]{\textbf{Temporal} \\ \textbf{Modeling}}  & \makecell[c]{\textbf{Spatial} \\ \textbf{Modeling}} & \makecell[c]{\textbf{Node} \\ \textbf{Relationships}} & \makecell[c]{\textbf{Critical} \\ \textbf{Node} \\ \textbf{Identification}} & \makecell[c]{\textbf{Causal} \\ \textbf{Awareness}} \\ \midrule
+			\cite{journal/tsg2024/15Kim}     & \cmark  & \cmark  & Dynamic & \xmark & \xmark \\
+			\cite{journal/tia2023/zheng}    & \cmark  & \xmark & \xmark & \xmark & \xmark \\
+			\cite{conference/aaai2021/11106Zhou}    & \cmark  & \cmark  & \xmark & \xmark & \xmark \\
+			\cite{conference/iclr2023/zhang}    & \cmark  & \cmark  & \xmark & \xmark & \xmark \\
+			\cite{conference/iclr2023/NieNSK23}    & \cmark  & \cmark  & \xmark & \xmark & \xmark \\
+			\cite{journal/tits2023/24huang}    & \cmark  & \cmark  & \xmark & \xmark & \xmark \\
+			\cite{journal/tiv2023/8li}    & \cmark  & \xmark & \xmark & \xmark & \xmark \\
+			\cite{journal/tii2021/17Morteza}    & \cmark  & \xmark & \xmark & \xmark & \xmark \\
+			\cite{journal/energy2023/278Wang}    & \cmark  & \cmark  & Static & \xmark & \xmark \\
+			\cite{journal/tkde2023/10Chen}    & \cmark  & \cmark  & Dynamic & \xmark & \xmark \\
+			\cite{conference/ijcai2019/1907Wu}    & \cmark  & \cmark  & Dynamic & \xmark & \xmark \\
+			\cite{journal/tsg2024/shi}    & \cmark  & \cmark  & Dynamic & \xmark & \xmark \\
+			\cite{journal/tits2024/25Qu}    & \cmark  & \cmark  & Static & \xmark & \xmark \\
+			\cite{journal/tpwrs2024/39Li}    & \cmark  & \cmark  & Dynamic & \xmark & \xmark \\
+			\cite{kong2024spatio}    & \cmark  & \cmark  & Dynamic & \cmark  & \xmark \\
+			Ours. & \cmark  & \cmark  & Dynamic & \cmark  & \cmark \\
+			\bottomrule
+		\end{tabular}
+	}
+	\label{tab:related_work}
+\end{table}
+
+% To improve EVCS load forecasting, it is crucial to transition from simply modeling statistical correlations to understanding true cause-and-effect dependencies between stations and incorporating knowledge about influential ``critical'' nodes. This requires incorporating causality principles, initially established by Granger\cite{granger1969investigating,10.1016/j.aiopen.2021.01.001} and further developed in studies on time series analysis and prediction tasks\cite{10214679, 10448031}.
+
+% In the domain of deep learning, recent efforts have shown promising results in integrating causal concepts into forecasting models. For example, Luca et al. \cite{massidda2023total} successfully utilized meta-learner predictors to model causal relationships for time-series analysis, achieving enhanced accuracy in load forecasting, while Sriram et al. \cite{8437162}  investigated time-varying causal dynamics within temporal datasets, suggesting the complex nature of causal dependencies in many real-world applications. While this integration of causal reasoning shows promise, especially when combined with powerful, spatially-aware techniques like GNNs, it has yet to be extensively applied in the specific area of EVCS load forecasting.  There is a significant opportunity to extend causal inference approaches to achieve greater accuracy and understanding within the domain of EVCS networks, as suggested by Liang et al. \cite{liang2023effects}.
+
+% Beyond explicitly representing causal dependencies, the recognition of critical EVCS nodes, particularly those with outsized influence on the surrounding charging patterns within a network, represents another vital area of advancement. Kong et al. \cite{kong2024spatio} note the significance of identifying key network components, those often denoted as “influencers” or “hubs,” which play pivotal roles in driving information flow and influencing overall system dynamics. In EVCS networks, it’s likely that stations positioned near transportation centers, along busy commuter routes,  or at popular gathering points, will exhibit a stronger impact on load behavior at their neighboring stations compared to more sparsely visited or less strategically located EVCS. While direct research into applying critical node analysis to enhance EVCS load forecasting remains somewhat sparse, related work in traffic prediction \cite{jiang2022graph} provides strong evidence for the importance of these ``influential'' elements in enhancing both predictive accuracy and understanding of system dynamics \cite{yu2020identifying}. These studies leveraging dynamic network characteristics and centrality measures to identify key points of influence, showcase the practical advantages of recognizing and specifically incorporating the dynamics of critical nodes within the modeling framework. 
+
+% In summary, while significant progress has been made in EVCS load forecasting with techniques such as GNNs,  the existing literature often neglects two fundamental aspects: the need to incorporate causal dependencies between EVCS to reveal true relationships and understand how load variations propagate across the network, and the importance of explicitly modeling the influence of key, strategically-positioned (``critical'') stations to enhance accuracy and provide deeper insights. Our proposed Causality-Aware Dynamic Multi-Graph Convolutional Network (CADGN) addresses these gaps by explicitly modeling both causal relationships and the unique influence dynamics among critical EVCSs, thus aiming for more robust, context-aware load forecasting.
+
+\subsection{Our Contributions} 
+We propose a prediction framework with better performance, and richer causal understanding. Specifically: 
+\begin{itemize}
+	\item  We propose CADGN, the first framework that explicitly integrates causal relationships and a dynamic focus on influential (``critical'') EVCS nodes for enhanced load forecasting in EVCS networks.
+	\item  We present the novel CAGLM and CRGLM modules within CADGN. CAGLM leverages causal inference to learn informative node representations based on cause-and-effect dependencies between EVCS.  CRGLM selectively focuses on dynamically capturing evolving relationships among the most influential EVCSs, offering insights that conventional GNN models miss.
+	\item  Through extensive experimental evaluation on real-world EVCS data, we demonstrate that CADGN achieves substantial performance gains compared to various state-of-the-art EVCS load forecasting approaches, showcasing the practical benefits of incorporating both causality and critical nodes in this crucial task.
+\end{itemize}
+
+The remainder of the paper is structured as follows.
+Section~\ref{section:problem} outlines the problem definition and key notations. Section~\ref{section:framework} details the proposed CADGN model. Section~\ref{section:case} presents the experimental setup and case study.
+Section~\ref{section:discussion} discusses the key findings.
+Finally, Section~\ref{section:conclusion} concludes the paper and discusses future research directions.
+
+
+\vspace{-6pt}
+\section{Preliminary}
+\label{section:problem}
+
+This section establishes the foundational concepts for EVCS load forecasting and introduces the mathematical frameworks of EVCS load networks, critical relationship graphs, and causality graphs. 
+%Finally, the concept of generalized score functions is presented and linked to causal discovery in these networks.
+
+\begin{definition}[EVCS Load Forecasting Problem]
+	The EVCS load forecasting problem is defined as a multivariate time series forecasting task.  Given previous $N_T$ time steps historical load data from $N_S$ EVCSs, represented as  $\bm{X}^{(t_{e})} = \{X^{(t_{b})}, X^{(t_{b}+1)}, \dots, X^{(t_{e})} \} \in \mathbb{R}^{N_T \times N_S}$, where each $X^t = \{ x^{(t,1)}, x^{(t,2)}, \dots, x^{(t, N_S)} \}$ is a vector of load values at time step $t$, the goal is to predict future load demands $\{X^{(t_{e}+1)}, X^{(t_{e}+2)}, \ldots, X^{(t_{e}+N_P)} \} \in \mathbb{R}^{N_P \times N_S}$, where $N_P$ represents the predictive step size. Mathematically, we aim to learn a mapping function $\mathbb{F}(\cdot)$ as follows:
+	\begin{equation}
+		\begin{aligned}
+			\{\hat{X}^{(t_{e}+1)}, \ldots, \hat{X}^{(t_{e}+N_P)} \} = \mathbb{F}\big((X^{(t_{b})}, \ldots, X^{(t_{e})}); \Theta \big),
+		\end{aligned}
+		\label{eq:forecast_function}
+	\end{equation}
+	where $\Theta$ denotes the model's trainable parameters,  $\hat{X}^{(t+N_P)}$ represents the predicted load values at $t+N_P$ time step .
+\end{definition}
+
+\begin{definition}[EVCS Load Network]
+	An EVCS load network can be modeled as a dynamic directed graph, $\bm{\mathcal{G}} = (\bm{V}, \bm{E}, \bm{A})$, to represent the interdependencies between EVCSs:
+	$\bm{V} = \{v^{(1)}, v^{(2)},  \dots, v^{(N_S)}\}$ is a set of nodes, with each node $v^{(i)}$ corresponding to an EVCS, $\bm{E} = \{e^{(i, j)}\}$ represents a set of directed edges, where  $e^{(i, j)}$ indicates a directional influence from node $v^{(i)}$ to node $v^{(j)}$, and  $\bm{A} \in \mathbb{R}^{N_S \times N_S \times N_T}$ represents a dynamic adjacency tensor, with $a^{(i, j, t)} \in \bm{A}$ quantifying the strength of direct influence from EVCS $v^{(i)}$ to $v^{(j)}$ at time step $t$. 
+\end{definition}
+
+
+\begin{definition}[Critical Relationship Graph] \label{def:cr_graph}
+	A critical relationship graph, $\bm{\mathcal{G}}_{cr} = (\bm{V}, \bm{E}_{cr}, \bm{A}_{cr})$, is a subgraph of the EVCS load network focusing on statistically significant connections. In this graph, $\bm{V}$ inherits the node set from the load network, and each node represents an EVCS. $\bm{E}_{cr} \subseteq \bm{E}$ represents a subset of edges from the load network, where $e^{(i, j)}_{cr} \in \bm{E}_{cr}$ represents a relationship exceeding a significance threshold. These edges can be bidirectional to reflect mutual influences. $\bm{A}_{cr} \in \mathbb{R}^{N_S \times N_S \times N_T}$ represents a dynamic adjacency tensor, with each entry $a^{(i, j, t)}_{cr}$ denoting the strength of the relationship at time step $t$.  The specific method for determining the significance and quantifying relationships will be detailed in Section \ref{section:framework}.
+\end{definition}
+
+\begin{definition}[Causality Graph] 
+	A causality graph, $\bm{\mathcal{G}}_{ca} = (\bm{V}, \bm{E}_{ca}, \bm{A}_{ca})$, is a directed acyclic graph (DAG) that represents the cause-and-effect relationships. Similar to EVCS Load Network and  Critical Relationship Graph, $\bm{V}$ utilizes the same node set. $\bm{E}_{ca} \subseteq \bm{E}$ represents a subset of directed edges where $e^{(i, j)}_{ca} \in \bm{E}_{ca}$ implies that EVCS $i$ has a causal effect on EVCS $j$. The acyclic property enforces unidirectional causal paths. $\bm{A}_{ca}  \in \mathbb{R}^{N_S \times N_S \times N_T}$ represents the dynamic causal influence strength over time.
+\end{definition}
+
+%	\begin{definition}[Generalized Score Function] 
+%		A generalized score function, denoted as $\mathcal{S}(\bm{\mathcal{G}}, \mathcal{X})$, evaluates the plausibility of a candidate causality graph, $\bm{\mathcal{G}}$, given observational data, $\mathcal{X}$. It aims to balance the graph's fit to the observed data with a penalty on its complexity, thus mitigating the risk of overfitting. A common formulation takes the form of  $\mathcal{S}(\bm{\mathcal{G}}, \mathcal{X}) = \mathbb{L}(\bm{\mathcal{G}}, \mathcal{X}) - \lambda \cdot C(\bm{\mathcal{G}})$. In this equation, $\mathbb{L}(\bm{\mathcal{G}}, \mathcal{X})$  represents the likelihood of the data given the causality graph, typically factored as  $\mathbb{L}(\bm{\mathcal{G}}, \mathcal{X}) = \prod_{i=1}^{N_S}  \mathbb{P}(X^i \mid \text{PA}^i_{\mathcal{G}}, \theta^i)$, where $\text{PA}^i_{\mathcal{G}}$  denotes the parents of node $X^i$ in graph $\bm{\mathcal{G}}$, indicating the direct causal influences, and $\theta^i$ represents the model parameters associated with those influences. Additionally,  $C(\bm{\mathcal{G}})$ acts as a penalty term for the graph's complexity, while  $\lambda > 0$ serves as a hyperparameter controlling the trade-off between data fidelity and complexity. It is important to highlight that the choice of specific score functions can vary, incorporating unique assumptions and penalties concerning the graph's structure or model parameters. This choice significantly impacts the learned causal structures from the observed data. 
+%		\label{eq:gsf}
+%	\end{definition}
+
+\vspace{-5pt}
+\section{Methodology}
+\label{section:framework}
+This section introduces the CADGN, consisting of four key modules: the Causality-Aware Graph Learning Module (CAGLM), the Critical Relationship Graph Learning Module (CRGLM), the Temporal Representation Fusion Module (TRFM), and a final output layer, as illustrated in Fig. \ref{fig:overview}.
+
+% This section introduces the Causality-Aware Dynamic Multi-Graph Convolutional Network (CADGN), a novel framework designed for accurate EVCS load forecasting. CADGN leverages the power of graph neural networks to model both causal and statistically prominent relationships within EVCS networks. The overall architecture, illustrated in Figure \ref{fig:overview}, comprises four key modules: a Causality-Aware Graph Learning Module (CAGLM), a Critical Relationship Graph Learning Module (CRGLM), a Temporal Representation Fusion Module (TRFM) and a final output layer. These modules work together to capture complex spatial-temporal patterns and dependencies within the EVCS load data, ultimately enhancing prediction accuracy.
+
+\begin{figure*}[t!]
+	\centering
+	\vspace{-6pt}
+	\includegraphics[width=1\linewidth]{./images/CADGN.pdf}
+	\caption{Overall architecture of the CADGN model for EVCS load forecasting.} 
+	\vspace{-15pt}
+	\label{fig:overview}
+\end{figure*}
+
+\vspace{-8pt}
+\subsection{Causality-Aware Graph Learning Module (CAGLM)}
+
+The Causality-Aware Graph Learning Module (CAGLM) aims to capture the inherent cause-and-effect relationships between EVCSs and utilize them to learn informative representations from the load data. This module operates in two stages: (1) construction of a causality graph, and (2) causal-dynamic graph learning using the constructed graph to derive feature representations. 
+\hl{The architecture of CAGLM is illustrated in Fig. \ref{fig:CAGLM}.}
+\begin{figure} [t!]
+    \centering
+    \includegraphics[width=1\linewidth]{./images/CAGLM.pdf}
+    \caption{\hl{The architecture of the CAGLM.}}
+	% demonstrating the process of causality graph construction and its subsequent utilization in causal-dynamic graph learning.}
+    \vspace{-10pt}
+\label{fig:CAGLM}
+\end{figure}
+CAGLM starts by normalizing the input EVCS load data, $\bm{X} \in \mathbb{R}^{N_T \times N_S}$, where $N_T$ represents the number of time steps and $N_S$ represents the number of EVCS. Normalization ensures that features contribute equally to model training and aids in faster convergence during optimization:
+\begin{equation}
+\begin{aligned}
+\tilde{\bm{X}} = \frac{\bm{X} - \mu(\bm{X})}{\sqrt{\frac{1}{N_T} \sum_{t=1}^{N_T} \Big(X^{(t)} - \mu(\bm{X}) \Big)^2} + \varepsilon},
+\end{aligned}
+\label{eq:normalization}
+\end{equation}
+where $\tilde{\bm{X}}$ represents the normalized data matrix, $\mu(\bm{X}) = \frac{1}{N_T} \sum_{t=1}^{N_T} X^{(t)}$ denotes the mean values of $\bm{X}$ along the temporal dimension, and $\varepsilon$ is a small constant to prevent division by zero.
+
+\subsubsection{Causality Graph Construction}
+Instead of analyzing the entire normalized data $\tilde{\bm{X}}$, we focus on a data segment $\tilde{\bm{X}}^{(t_{b}: t_{b}+t_{m})}$, where $t_m < N_T$, to efficiently capture causal structures. This segment is used to infer a causal directed acyclic graph (DAG), $\bm{\mathcal{G}}_{ca} = (\bm{V}_{ca}, \bm{E}_{ca})$, representing the cause-and-effect relationships between EVCSs, where $\bm{V}_{ca} = \{v^{(1)}, \dots, v^{(N_s)}\}$ represents the set of EVCS (nodes) and $E_{ca}$ is the set of causal edges. The goal is to find the DAG, $\bm{\mathcal{G}}_{ca}$, that maximizes the cross-validated likelihood score $\mathcal{L}_{cv}$, subject to the acyclicity constraint of the graph.  This optimization problem is addressed using the Time-Fragment Greedy Equivalence Search (TFGES) algorithm (Algorithm \ref{alg:tfges}), based on a combination of the Generalized Score Function (GSF) \cite{huang2018generalized} and cross-validated likelihood. 
+TFGES is a greedy search approach for solving this optimization problem. It iteratively explores potential edges, adding them to the graph only if they lead to a statistically significant increase in the cross-validated likelihood score, $\mathcal{L}_{cv}$, while ensuring the graph remains acyclic. This is achieved by first constructing a temporary graph $\mathcal{G}'$ for each candidate edge $(v^{(i)}, v^{(j)})$, and then evaluating its fit using $\mathcal{L}_{cv}$. If the addition significantly improves $\mathcal{L}_{cv}$, the change is accepted, and the graph $\bm{\mathcal{G}}_{ca}$ is updated. The process continues until no further statistically significant improvements are observed, or a maximum of 100 iterations is reached.
+
+\begin{algorithm}[b!]
+\small
+\SetAlgoLined
+\KwIn{Normalized load data segment $\tilde{\bm{X}} \in \mathbb{R}^{t_m \times N_S}$, Regularization parameter $\lambda$}
+\KwOut{Causality graph $\bm{\mathcal{G}}_{ca} = (\bm{V}_{ca}, \bm{E}_{ca})$}
+
+Initialize $\bm{\mathcal{G}}_{ca} = (\bm{V}_{ca}, \bm{E}_{ca})$ with $\bm{V}_{ca} = \{v^{(1)}, \dots, v^{(N_s)}\}$ and  $\bm{E}_{ca} = \emptyset$\;
+
+\While{Stopping criteria not met}{
+	\ForAll{candidate edge pairs  $(v^{(i)}, v^{(j)}) \notin \bm{E}_{ca}$ }{
+		Construct candidate graph $\bm{\mathcal{G}}' = (\bm{V}_{ca}, \bm{E}_{ca} \cup \{(v^{(i)}, v^{(j)})\})$\;
+		
+		Compute  cross-validated score: 
+          $$ \mathcal{L}_{cv}(\bm{\mathcal{G}}'; \tilde{\bm{X}}) = \frac{1}{N_Q} \sum_{q=1}^{N_Q} \text{GSF} \Big(\tilde{\bm{X}}^{(q)}, pa(v_{(i)}, \bm{\mathcal{G}}'); \lambda \Big); $$
+
+		
+		\uIf{$\mathcal{L}_{cv}(\bm{\mathcal{G}}'; \tilde{\bm{X}})$ is significantly better than $\mathcal{L}_{cv}(\bm{\mathcal{G}}_{ca}; \tilde{\bm{X}})$}{
+			Update $\bm{\mathcal{G}}_{ca}  \leftarrow \bm{\mathcal{G}}'$\;
+		} 
+	}
+}
+\caption{TFGES}
+\label{alg:tfges}
+\end{algorithm}
+
+At the heart of $\mathcal{L}_{cv}$ computation is the Generalized Score Function (GSF), which assesses the goodness of fit for each candidate graph $\mathcal{G}'$. GSF balances the maximum achievable log-likelihood, $\mathcal{L}_{mll}$, with a penalty on the complexity of the graph:
+\begin{equation}
+\begin{aligned}
+\text{GSF}(\mathcal{G}, \bm{X}; \lambda) = \mathcal{L}_{mll}(\mathcal{G}, \bm{X}; \lambda) - \lambda |E_{ca}|,
+\end{aligned}
+\label{eq:gsf}
+\end{equation}
+where $|E_{ca}|$ denotes the number of edges in the graph. $\mathcal{L}_{mll}$ represents the maximum log-likelihood attainable when fitting a kernel ridge regression model, using a Gaussian kernel, to predict the load of each EVCS node $v_i$ based on the loads of its parents $pa(v_i, \mathcal{G}')$ in $\mathcal{G}'$. $\mathcal{L}_{mll}$ is computed as:
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{m l l}(\tilde{\boldsymbol{X}}, \mathcal{Z})= & -\frac{t_m}{2} \log \left|t_m \lambda K_X\left(K_Z+t_m \lambda \bm{I}\right)^{-1} K_X\right| \\
+& -\frac{t_m}{2} \log (2 \pi)-\frac{t_m}{2},
+\end{aligned}
+\label{eq:mll}
+\end{equation}
+where $K_X$ and $K_Z$ are kernel matrices capturing the pairwise similarities between time steps in the feature space, $\lambda$ is the regularization parameter, and $\bm{I}$ is the identity matrix. The Gaussian kernel is employed due to its ability to capture a wide range of non-linear relationships within the EVCS load data.
+
+To robustly estimate the goodness of fit for each candidate graph, TFGES utilizes $N_Q$-fold cross-validation when computing $\mathcal{L}_{cv}$. This entails dividing the data into $N_Q$ folds and then iteratively using $N_Q-1$ folds to train the kernel ridge regression (within GSF) and the remaining fold to evaluate the log-likelihood. The average log-likelihood over all folds provides the $\mathcal{L}_{cv}$ score for that graph, mitigating overfitting biases and ensuring a reliable assessment of the candidate graph structure.
+
+
+\subsubsection{Causal-Dynamic Graph Learning}
+Once the causality graph $\bm{\mathcal{G}}_{ca}$ is constructed, the second stage of CAGLM involves causal-dynamic graph learning to derive meaningful representations of the EVCS load data. For this purpose, CAGLM utilizes a stacked Graph Convolutional Network (SGCN). Each layer of the SGCN utilizes $\bm{\mathcal{G}}_{ca}$ as the underlying adjacency structure to aggregate information from neighboring nodes, enhancing the representations with knowledge of causal dependencies. The core operation within each SGCN layer is:
+\begin{equation}
+\bm{H}^{(l+1)} = \sigma \Big( \bm{D}^{-1/2} \bm{A} \bm{D}^{-1/2} \bm{H}^{(l)} \bm{W}^{(l)} \Big),
+\label{eq:gcn_layer}
+\end{equation}
+where $\bm{H}^{(l)} \in \mathbb{R}^{N_S \times d_l}$ is the matrix of node features for all $N_S$ EVCS nodes at layer $l$, $d_l$ denotes the number of features at layer $l$, $\bm{A}$ is the adjacency matrix from $\bm{\mathcal{G}}_{ca}$, $\bm{D}$ is the corresponding degree matrix for normalization, $\bm{W}^{(l)}$ are trainable weights at layer $l$, and $\sigma(\cdot)$ is the hyperbolic tangent (tanh) activation function.
+
+To improve generalization and robustness to potential noise and inconsistencies in the data, the input to the SGCN is not the raw data $\tilde{\bm{X}}$, but rather a temporally masked representation, $\bm{X}_{m}$, created as follows:
+\begin{equation}
+\bm{X}_m^{(i,t)} =
+\begin{cases}
+0, & \text{if } \mathbb{M}_{ca}(R_d) = 1, \\
+\bm{X}^{(i,t)}, & \text{otherwise},
+\end{cases}
+\label{eq:temporal_masking}
+\end{equation}
+where $\bm{X}_m^{(i,t)}$ represents the value for EVCS $i$ at time step $t$ after masking. $\mathbb{M}_{ca}(R_d)$ is a Bernoulli random variable with probability $R_d$ (the masking ratio), determining whether a given input element is set to 0.
+
+
+
+By stacking multiple GCN layers with appropriate non-linearities, batch normalization (BN), and dropout regularization, the SGCN can learn hierarchical representations that capture both the global influence of causal dependencies from $\bm{\mathcal{G}}_{ca}$ and the local temporal patterns within each EVCS’s load history.
+The intermediate representations $\bm{H}^{(g, i)}_{ca}$ obtained from each SGCN block are then combined through element-wise addition (denoted as $\oplus$). To further capture local temporal dependencies, a separate Multilayer Perceptron (MLP) processes the entire (non-masked) data segment and produces a local representation $\bm{H}^{(local)}_{ca}$. The two elements are then fused to create $\bm{H}^{(r)}_{ca}$ as follows:
+
+\begin{equation}
+\begin{aligned}
+\bm{H}^{(r)}_{ca} \leftarrow \underset{\forall i \in{1, \cdots, N_{ca}}}{\operatorname{Aggregate}}\Big(\bm{H}_{ca}^{(g, i)}\Big) \oplus \bm{H}^{(local)}_{ca}.
+\end{aligned}
+\label{eq:concat}
+\end{equation}
+
+Finally, two consecutive 1-dimensional temporal convolutional layers are applied to refine $\bm{H}^{(r)}_{ca}$:
+\begin{equation}
+\bm{H}^{(o)}_{ca} = \text{Conv}^{(2)}_{ca} \Big(\sigma \big( \text{Conv}^{(1)}_{ca} (\bm{H}^{(r)}_{ca} ) \big)\Big),
+\label{eq:refine_representation}
+\end{equation}
+where $\operatorname{Conv}_{c a}^{(1)}$ and $\operatorname{Conv}_{c a}^{(2)}$ represent the two temporal convolutional operations, each parametrized with learnable kernel weights and incorporating non-linear activations to model complex patterns within the temporal dimension of the input features. By stacking these convolutional layers, CAGLM performs hierarchical feature extraction, where higher-level features capture more abstract and complex patterns from the fused causal and temporal information present in $\boldsymbol{H}_{c a}^{(r)}$. This multi-level representation $\boldsymbol{H}_{c a}^{(o)}$ then serves as a refined summary of the load dynamics from the CAGLM's perspective, capturing both the network's causal structure and localized temporal trends within the input data segment.
+
+
+
+\subsection{Critical Relationship Graph Learning Module (CRGLM)} 
+The Critical Relationship Graph Learning Module (CRGLM) 
+\hl{, depicted in Fig. \ref{fig:CRGLM},} 
+plays a crucial role by capturing significant evolving relationships between particularly influential EVCS within the network. It achieves this through a two-step process: identifying the subset of critical nodes (influential EVCS) and then dynamically learning from the graph representing their relationships.
+
+\begin{figure} [t!]
+	\centering
+        \vspace{-10pt}
+	\includegraphics[width=1\linewidth]{./images/CRGLM.pdf}
+	\caption{\hl{The overall illustration of the CRGLM.}}
+	\vspace{-18pt}
+	\label{fig:CRGLM}
+\end{figure}
+
+To identify the critical nodes, a measure of centrality based on historical load dependencies is employed.  First, a pairwise relationship score  $e^{(i,j)}$, signifying the degree of influence between EVCS  $v^{(i)}$  and  $v^{(j)}$, is calculated as follows:
+
+\begin{equation}
+	e^{(i,j)} = \frac{\sum_{k=1}^{N_T} \Big(\bm{X}^{(i,k)} \cdot \bm{X}^{(j,k-T_d)} \Big) w^{(i,j)}}{\Big(\sqrt{\sum_{k=1}^{N_T} (\bm{X}^{(i,k)})^2} \cdot \sqrt{\sum_{k=1}^{N_T-T_d} (\bm{X}^{(j,k)})^2} ~\Big) + \epsilon},
+	\label{eq:cri_e}
+\end{equation}
+where $\bm{X}^{(i,k)}$ is the input feature vector for EVCS $i$ at time step $k$; $T_d$ represents a temporal shift to account for potential lagged relationships; $N_T$ denotes the historical time window considered for calculating this score, as defined in Eq.(\ref{eq:forecast_function}). The term  $w^{(i,j)}$ acts as a learnable weight, allowing the model to dynamically emphasize or de-emphasize specific pairwise EVCS relationships during training. A small constant $\epsilon$ is introduced to enhance numerical stability by preventing division by zero.   
+
+Using these pairwise relationship scores from  Eq.(\ref{eq:cri_e}), the CRGLM module calculates a centrality score $s^{(i)}$,  for each EVCS $v^{(i)}$.  This score aggregates the relationship scores of an EVCS with all others in the network, aiming to identify EVCSs with significant overall influence:
+\begin{equation}
+    \begin{aligned}
+            s^{(i)} = \sum_{j=1}^{N_s} \Big(e^{(i,j)}_{cr} + e^{(j,i)}_{cr}\Big). 
+    \end{aligned}
+    \label{eq:centrality_score}
+\end{equation} 
+
+Critically, by summing both $e_{i,j}$ and  $e_{j,i}$, this formulation considers bidirectional influence between EVCS, acknowledging that influential charging stations impact others while also being influenced in return. 
+Following this, the CRGLM employs a Top-$K$ selection mechanism, guided by a threshold parameter $R_k$, to identify the most influential electric vehicle charging stations (EVCSs) based on their centrality scores. This process formally defines the set of critical nodes $\bm{C}_{cr}$ as follows:
+\begin{equation}
+    \begin{aligned}
+            \bm{C}_{cr} = \text{Top-$K$}\Big(\bm{S}, R_k \Big) =  \Big\{i \mid \text{rank} \Big(s^{(i)}, \bm{S}\Big)  \le   R_k \Big\},
+    \end{aligned}
+    \label{eq:critical_nodes}
+\end{equation}  
+where $\text{rank} (s^{i}, \bm{S})$ represents the rank of EVCS $i$'s centrality score $s^{i}$ within the entire set of centrality scores (denoted by $\bm{S} = \{s^{(1)}, s^{(2)},\ldots, s^{(N_s)} \}$). The model deems only those EVCSs as critical whose centrality scores fall within the top $R_k$ proportion, thereby concentrating its attention on the most significant interactions.
+
+These identified critical nodes become the constituent elements of the Critical Relationship Graph. This graph,  $\bm{\mathcal{G}}_{cr} = (\bm{V}_{cr}, \bm{E}_{cr}, \bm{A}_{cr})$ (refer to Definition  \ref{def:cr_graph}), inherits the same set of nodes as the full EVCS network, i.e.,  $\bm{V}_{cr} = \bm{V}$. However, $\bm{\mathcal{G}}_{cr}$   differentiates itself from the full network graph through its meticulously constructed adjacency matrix $\bm{A}_{cr}$, specifically designed to exclusively represent interactions between the critical EVCS. Each entry $\bm{A}_{cr}^{i,j, t}$ within the time-dependent adjacency tensor $\bm{A}_{cr}$   at time step $t$ is defined as follows:
+\begin{equation}
+    \bm{A}_{cr}^{i,j,t} = 
+    \begin{cases}
+        1, & \text{if } (i \in \bm{C}_{cr} \vee j \in \bm{C}_{cr}) \wedge (i \neq j), \\
+        0, & \text{otherwise},
+    \end{cases}
+    \label{eq:critical_adj}
+\end{equation}
+where $i$ and $j$ denotes the different EVCSs.
+Essentially, $\bm{A}_{cr}$ encodes a dynamic graph structure where connections are established between critical nodes and other nodes in the network. The time-dependent nature of this adjacency structure enables CRGLM to capture evolving influences between these vital nodes throughout the load forecasting process.   
+
+After identifying the critical nodes and forming the initial graph $\bm{\mathcal{G}}_{cr}$ using Eq.(\ref{eq:critical_adj}),  the CRGLM module employs a similar approach to the CAGLM, but on the critical graph $\bm{\mathcal{G}}_{cr}$. First, CRGLM utilizes a dynamic graph learning structure with SGCN across $N_{cr}$ layers to process the masked data $\bm{X}_{m}$. Each layer generates an intermediate representation $\bm{H}^{(g, i)}_{cr}$, specifically capturing patterns localized around critical nodes. The formula for $\bm{H}^{(g, i)}_{cr}$ mirrors Eq.(\ref{eq:refine_representation_cr}), but now using the critical graph's adjacency matrix $\bm{A}_{cr}$ during convolution operations.
+Analogous to the CAGLM, the representations of $\bm{H}^{(g, i)}_{cr}$ are aggregated and then concatenated with a separate, locally-focused temporal representation using Eq.(\ref{eq:concat}). The fused feature representation from the CRGLM then undergoes further refinement through a similar two-layer convolutional process as in CAGLM, following the pattern described by Eq.(\ref{eq:refine_representation}), resulting in the CRGLM’s final output representation $\bm{H}^{(o)}_{cr}$:
+\begin{equation}
+	\bm{H}^{(o)}_{cr} = \text{Conv}^{(2)}_{cr} \Big(\sigma \big( \text{Conv}^{(1)}_{cr} (\bm{H}^{(r)}_{cr} )  \big)\Big),
+	\label{eq:refine_representation_cr}
+\end{equation}
+where $\text{Conv}^{(1)}_{cr}$ and $\text{Conv}^{(2)}_{cr}$ represent the temporal convolutional operations in CRGLM.
+
+\subsection{Temporal Representation Fusion Module and Output Layer}
+
+%\begin{figure} [htbp!]
+%	\centering
+%	\includegraphics[width=1\linewidth]{./images/TRFM.pdf}
+%	\vspace{-10pt}
+%	\caption{The architectures of the TRFM and output layer.}
+%	\vspace{-10pt}
+%	\label{fig:TRFM}
+%\end{figure}
+
+\hl{The CAGLM and CRGLM serve complementary roles in capturing the intricate spatiotemporal dependencies of EVCS load dynamics. CAGLM constructs a causality graph to model directional dependencies among EVCSs, leveraging a SGCN to propagate causal influences and refine feature representations. This approach enhances interpretability by explicitly encoding cause-and-effect relationships. In contrast, CRGLM selects a subset of critical nodes based on centrality measures to efficiently model dominant interactions, prioritizing the most influential EVCSs while potentially overlooking finer patterns.
+The combination of CAGLM and CRGLM provides a more detailed and stable representation of load dynamics. CRGLM improves efficiency by selecting critical nodes but may overlook local load variations, a limitation CAGLM addresses through causal modeling. While CAGLM enhances interpretability with its causality graph, CRGLM captures changing relationships over time, ensuring a balanced and comprehensive understanding of EVCS load dynamics.}
+
+The Temporal Representation Fusion Module (TRFM) acts as a bridge, receiving the outputs $\bm{H}^{(o)}_{ca}$ and  $\bm{H}^{(o)}_{cr}$ from the CAGLM and CRGLM, respectively. Its core responsibility is to effectively integrate the rich, multi-faceted temporal patterns present in these inputs, thus consolidating the insights obtained by considering both causal relationships and critical EVCS interdependencies. 
+First, $\bm{H}^{(o)}_{ca}$  and $\bm{H}^{(o)}_{cr}$ are combined through channel-wise concatenation. Subsequently, two temporal 1D convolutional layers are applied to the combined features, drawing inspiration from their effectiveness in capturing local patterns and dependencies within sequential data, resulting in a temporally rich output representation:
+\begin{equation}
+	\bm{H}^{(o)}_{tr} = \text{Conv}^{(2)}_{tr}\left(\psi \big( \text{Conv}^{(1)}_{tr}(\bm{H}^{(o)}_{ca} \oplus \bm{H}^{(o)}_{cr}) ~ \big) \right),
+	\label{eq:trfm_output}
+\end{equation}
+where $\bm{H}^{(o)}_{tr}$ denotes the TRFM’s final output; $\text{Conv}^{(1)}_{tr}$ and $\text{Conv}^{(2)}_{tr}$   represent the consecutive temporal convolution operations within the module, each associated with its own set of learnable parameters, and $\psi(\cdot)$ represents the Rectified Linear Unit (ReLU) activation function, adding complexity and non-linearity crucial for modeling the inherent complexities in EVCS load dynamics. By processing the concatenated representations in this manner, the TRFM aims to discover intricate interplays between the temporal patterns present in  $\bm{H}^{(o)}_{ca}$  (representing long-range causal influences and local temporal variations)  and $\bm{H}^{(o)}_{cr}$ (encapsulating the dynamics among critical EVCSs within the network), ultimately providing the downstream layer with a more informative and robust basis for generating forecasts.
+
+This refined temporal representation $\bm{H}^{(o)}_{tr}$ from the TRFM then feeds into the output layer to generate the EVCS load forecasts. The input is formed by concatenating  $\bm{H}^{(o)}_{tr}$  with the original, pre-processed (unmasked) EVCS load data spanning from time steps $t_{b}$ to $t_{e}$. Finally, this concatenated input is processed by a fully connected network (FCN), which consists of a series of linear layers that learn to map the fused spatial-temporal representations into the target load forecasts, effectively capturing the diverse relationships learned throughout the various modules of CADGN.
+Mathematically, this output generation process can be represented as: 
+\begin{equation}
+	\hat{\bm{X}}^{t_{e}+1: t_{e}+N_P} =  \text{FCN}\big(\bm{H}^{(o)}_{tr}  \oplus \bm{X}^{t_{b}: t_{e}}; \Theta_{out} \big),
+	\label{eq:final_output}
+\end{equation}  
+where $\hat{\bm{X}}^{t_{e}+1:t_{e}+N_P}$ represents the final EVCS load prediction outputted by the CADGN model for time steps from  $t_{e} + 1$  to $t_{e} + N_P$.
+
+The performance of the CADGN during training is evaluated using the Mean Squared Error (MSE) loss function, calculated by comparing the generated forecasts $\hat{\bm{X}}^{t_{e}+1: t_{e}+N_P}$ with the corresponding ground truth values  ${\bm{X}}^{t_{e}+1: t_{e}+N_P}$:
+\begin{equation}
+    \mathcal{L}_{total}(\Theta) =  \frac{1}{N_P N_S} \sum_{i=1}^{N_P} \sum_{j=1}^{N_S} \big(\hat{X}^{i,j} - {X}^{i,j}\big)^2,
+    \label{eq:mse_loss}
+\end{equation}
+where $\mathcal{L}_{total}(\Theta)$ represents the loss for the model parameters $\Theta$, which encompass parameters from all constituent modules like SGCN layers, traditional convolutional layers, the MLP, and other learnable components. By minimizing $\mathcal{L}_{total}(\Theta)$  through an optimization algorithm, the model is driven to generate EVCS load forecasts that align as closely as possible with the historical patterns and relationships it has learned.
+
+% Through this elaborate yet meticulously orchestrated process, involving the construction of a causality-aware graph, identification of critical nodes, representation learning on a constructed critical relationship graph, and culminating in the sophisticated fusion of multi-scale spatial and temporal information, the CADGN model seeks to produce highly accurate, robust, and interpretable EVCS load forecasts.  
+
+% \section{Theoretical Analysis and Complexity} 
+% \label{section:analysis} 
+
+% This section provides a theoretical perspective on the proposed CADGN model. First, the role of generalized score functions within the context of learning causality graphs from time series data is examined. Subsequently, a complexity analysis of CADGN’s key components is presented.
+
+% \subsection{Learning causality graphs with Generalized Score Functions} 
+
+% The task of uncovering causal dependencies between EVCSs within CADGN’s CAGLM module fundamentally relies on the framework of causal discovery from time series data.  Given the observed multivariate time series of EVCS loads, represented as $\mathcal{X} = \{\bm{X}^{t}\}_{t=1}^T$, the goal is to infer a causality graph,  $\bm{\mathcal{G}}_{ca}$,  that best captures the underlying causal relationships between these time series, aligning with the definition presented in Definition 3.  
+
+% To guide the search for such a graph and formally evaluate the quality of candidate causal structures, generalized score functions, as introduced in Definition 4, are essential.  These score functions strike a balance between how well a proposed causality graph structure explains the observed data (data fidelity) and its inherent complexity. A common and widely applicable class of score functions takes the form: 
+
+% \begin{equation}
+% 	\mathcal{S}(\bm{\mathcal{G}}, \mathcal{X}) = \log \mathbb{L}(\bm{\mathcal{G}}, \mathcal{X} | \Theta)  - \lambda \cdot h(\bm{\mathcal{G}}),
+% 	\label{eq:general_score}
+% \end{equation}  
+% where: 
+% \begin{itemize}
+% 	\item $\bm{\mathcal{G}}$  represents a candidate causality graph structure;
+% 	\item $\mathcal{X}$  represents the observed multivariate EVCS load time series data;
+% 	\item $\mathbb{L}(\bm{\mathcal{G}}, \mathcal{X} | \Theta) =  \mathbb{P}(\mathcal{X} | \bm{\mathcal{G}},  \Theta) $ is the likelihood of the data given the graph structure, indicating how well the observed data are generated under the hypothesized causal relationships implied by $\bm{\mathcal{G}}$;
+% 	\item  $\Theta$ represents the parameters of the underlying causal model (which, in the context of CADGN, could be related to the parameters of the temporal convolution layers);
+% 	\item $h(\bm{\mathcal{G}})$  is a penalty term on the complexity of the causality graph (examples include the number of edges or more sophisticated measures based on graph properties).   A simpler graph is generally preferred as it indicates a more parsimonious explanation of the observed dependencies.
+% 	\item  $\lambda \ge 0$  is a hyperparameter that balances data fidelity (likelihood) with model complexity. Larger values of $\lambda$ favor simpler graphs, preventing overfitting to the data, which could generalize poorly to unseen data or relationships between EVCS.
+% \end{itemize}  
+
+
+% The specific choice of the complexity penalty $h(\bm{\mathcal{G}})$  and the model to estimate the likelihood  $ \mathbb{L}(\bm{\mathcal{G}}, \mathcal{X} | \Theta)$ depends on the nature of the EVCS load time series data, computational constraints, and assumptions regarding the underlying causal relationships between EVCS loads.  Popular choices include Bayesian networks and their variants, where the likelihood factorizes over the individual EVCS nodes based on their parents in the graph  $\bm{\mathcal{G}}$. 
+
+
+% Within the framework of CADGN, a search algorithm is used to identify a graph structure that maximizes (or at least approximates the maximization)  of  the score function.  Given the discrete and typically vast search space of possible DAG structures, exact optimization can be intractable, especially as the number of EVCS  $N_s$ increases.  Heuristic search algorithms, including greedy methods like the GES algorithm or those based on constraint-based approaches, are often employed to efficiently explore the search space.  
+
+% The effectiveness of such algorithms, combined with the chosen score function and its assumptions, directly affects the quality and interpretability of the learned causality graph structure  $\bm{\mathcal{G}}_{ca}$,  subsequently influencing the performance of downstream forecasting within CADGN.  While a thorough exploration of optimal causal discovery algorithms and score functions for the specific domain of EVCS load data analysis falls beyond the scope of this current work, it represents a promising area for future investigation to potentially further improve both the accuracy and interpretability of EVCS load forecasting with CADGN.
+
+
+% \subsection{Complexity Analysis}
+% In this subsection, we detail the computational and spatial complexities associated with each component, providing a comprehensive examination of the factors influencing model efficiency and resource requirements.
+
+% The CAGLM primarily involves causal discovery and graph convolution operations. The causal discovery process, using the TFGES, incurs a time complexity of $ O(N_S^2 t_m^2) $. The graph convolution operations, utilizing SCGNs, are the most computationally intensive, with a time complexity of $ O(N_{ca}(|\bm{E}_{ca}| d + N_S d^2)) $. This accounts for the graph's edge operations and the transformation of node features, where $N_{ca}$ is the number of SCGN layers, $|\bm{E}_{ca}|$ is the number of edges, and $ d $ is the dimension of feature embedding. Thus, the total time complexity for CAGLM is $ O(N_S^2 t_m^2 + N_{ca}(\bm{E}_{ca} d + N_S d^2))$. The spatial complexity is determined by the need to store the adjacency matrix and feature representations, approximated as $ O(|\bm{E}_{ca}| + N_{ca} d^2 + N_{ca} N_S d^2) $.
+
+% The main operations of CRGLM include centrality calculation, critical node selection, and dynamic graph learning. Calculating centrality across all pairs of nodes involves a time complexity of $ O(N_T N_S^2) $. The selection of Top-K critical nodes has a time complexity of $ O(N_S \log(N_S)) $. For dynamic graph learning, the time complexity is $ O(N_{cr}(|\bm{E}_{cr}| d + |\bm{C}_{cr}| d^2)) $, where $ \bm{E}_{cr} $ and $ \bm{C}_{cr} $ represent the number of edges and critical nodes, respectively. Assuming a sparse graph structure where $ \bm{E}_{cr} $ is proportional to $ \bm{C}_{cr} $, the total approximate time complexity for CRGLM is $O(N_T N_S^2 + N_S \log(N_S) + N_{cr}(|\bm{C}_{cr}| d^2))$. The spatial complexity mainly involves storing the adjacency matrix and feature representations of the critical graph, approximated as $O(|\bm{E}_{cr}|) + O(N_{cr} d^2 + N_{cr}|\bm{C}_{cr}| d^2)$.
+
+% For the TRFM and the output layer, the combined processing of outputs from CAGLM and CRGLM involves channel-wise concatenation and temporal convolutions. These operations contribute a time complexity of $ O((N_S + d) k) $, where $k$ is the kernel size of the convolutional filters, generally considered constant. The final linear mapping processes the fused features and the original data, with a complexity of $ O(N_P(d + N_T)) $, where $ N_P $ denotes predictive steps. The total model complexity, encompassing all modules, is approximate $ O(N_S^2 t_m^2 + 2N_{ca}(\bm{E}_{ca} d + N_S d^2) + N_T N_S^2 + N_S \log(N_S) + N_P(d + N_T)) $. The spatial complexity includes storing the weights and intermediate feature representations, estimated as $ O(|\bm{E}_{ca}| + 2(N_{ca} d^2 + N_{ca} N_S d^2) + 2 d N_P) $. 
+
+
+% 
+
+% This subsection provides an in-depth complexity analysis of CADGN, focusing on the computationally demanding modules: the CAGLM and CRGLM. 
+% Assuming each module utilizes a two-layer GCN architecture, each GCN layer requires $O(|\bm{E}|  \cdot d \cdot d’)$, where  $|\bm{E}|$ is the number of edges in the corresponding graph, $d$ and $d'$ are the input and output feature dimensions respectively. For both modules,  $\bm{\mathcal{G}}_{cr}$   and $\bm{\mathcal{G}}_{ca}$  are subgraphs of $\bm{\mathcal{G}}$, hence their time complexities are inherently bounded by the complexity of applying a GCN on the full EVCS graph $\bm{\mathcal{G}}$. In the worst-case scenario, all EVCSs have interdependencies, resulting in  $|\bm{E}|  = O(N_S^2)$, reflecting a fully connected graph.   Considering that $N_s$, the total number of EVCS,  is usually within the range of hundreds to a few thousands and is a constant parameter for a specific EVCS network, this quadratic term becomes essentially a linear factor with respect to the input sequence length.  
+
+% Therefore, with both the temporal and convolutional layers demonstrating linear time complexity concerning the input sequence length, the overall dominant computational component within each training iteration of CADGN also scales  linearly with respect to the input sequence length. This favorable scalability ensures that CADGN remains computationally manageable for substantial EVCS networks, enabling its practical deployment even in large-scale settings.  Moreover, within both the CAGLM and CRGLM, by selecting a subset of critical nodes (influential EVCSs), the number of edges in the graphs processed by these modules  ($\bm{\mathcal{G}}_{cr}$   and $\bm{\mathcal{G}}_{ca}$)  is reduced significantly compared to the full graph, which in turn lessens the overall computational cost of GCN computations without compromising the model's ability to capture essential inter-EVCS dependencies. 
+
+% Additionally, while the theoretical time complexity for graph construction, particularly with algorithms like GES,  can potentially grow super-exponentially in the worst-case, practical strategies are implemented in CADGN to address this potential bottleneck. Specifically, constructing the causality graph within CAGLM based only on an initial temporal segment (  $t_{b}$  to $t_{b} + T $, as detailed in Equation \ref{eq:causal_discovery}), effectively reduces the computational burden without sacrificing accuracy in inferring dominant causal relationships. By carefully considering such trade-offs between theoretical complexity and practical implementations, CADGN ensures both computational tractability and its capability to model essential relationships within large EVCS networks, enabling efficient load forecasting at scale.
+
+\section{Evaluation}
+\label{section:case}
+
+\subsection{Dataset Description}
+
+%To verify the effectiveness of our proposed CADGN, we conduct experiments on three real-world charging load datasets from different areas and time periods. 
+%To evaluate the accuracy of our proposed CADGN, real-world electric vehicle charging load datasets from three cities were collected in this study: including Palo Alto, USA\footnote{\url{https://data.cityofpaloalto.org}}, Boulder\footnote{\url{https://open-data.bouldercolorado.gov/datasets/}} and South Korea\cite{journal/scidata2024/11Keon}.
+%Each dataset includes the start and end times, and the total energy consumption (in $kWh$) for each charging event. 
+%To meet the requirements of the load forecasting task, each original dataset is transformed into an hourly resolution time series, representing the accumulation charging load (in $kW$) in each hour in each charging station.
+%These datasets were also utilized in prior research \cite{journal/tits2023/24huang, journal/access2023/11Mohammad}, although for different research objectives. 
+%The basic statistics of these three datasets are presented in Table \ref{table:statistical}.
+
+To assess the efficacy and performance of the proposed CADGN model for EVCS load forecasting, a comprehensive evaluation is conducted on real-world electric vehicle charging station load datasets gathered from three distinct urban environments: Palo Alto, USA \footnote{\url{https://data.cityofpaloalto.org}}, Boulder, USA \footnote{\url{https://open-data.bouldercolorado.gov/datasets/}}, and a metropolitan area within South Korea \cite{journal/scidata2024/11Keon}. Each dataset intrinsically encompasses records for charging sessions, providing granular information including the start and end timestamps, as well as the total energy consumed (measured in $kWh$) during each session. 
+
+\hl{While valuable in its raw form, session-level data must be transformed to become suitable for the time series forecasting task addressed in this work. Accordingly, the raw session data for each EVCS is converted into an hourly aggregated time series, representing the total load demand within each hour at the respective charging station. The transformation process involves three primary steps: (1) The raw dataset, which includes attributes such as start and end times, charging durations, and energy delivered, is cleaned to ensure consistency. Charging sessions with durations exceeding 24 hours, energy delivery over 150 $kWh$, or invalid timestamps (e.g., start time later than end time) are discarded. (2) The cleaned data is divided into minute-level intervals. Energy delivered during each session is distributed proportionally across its duration, resulting in a detailed temporal representation of the energy usage. (3) The minute-level data is aggregated into hourly intervals. The total energy delivered across all charging stations is calculated, adhering to the temporal resolution commonly used by prior studies \cite{journal/tits2023/24huang, journal/tiv2023/8li, journal/tpwrs2024/Wang} and utility providers for effective planning and decision-making.}
+
+
+% This temporal aggregation, crucial for focusing on macroscopic load patterns and reducing noise inherent in fine-grained charging event data, ensures that the dataset readily aligns with the forecasting requirements of various grid operational and planning decisions which are often based on hourly load profiles. Additionally, by aggregating the load demands into hourly intervals,  we align the dataset with the standard temporal resolution often used by grid operators and utility providers for planning and decision-making.
+We use a 7:1:2 data split ratio for training, validation, and testing.
+% For model training and validation, a 70\%-10\%-20\% data split strategy is adopted, consistently allocating 70\% of each dataset for training CADGN and baseline models, reserving 10\% for hyperparameter tuning and model selection during validation, and dedicating the remaining 20\% to rigorously assess model performance on previously unseen (test) data. 
+Table \ref{table:statistical} summarizes essential descriptive statistics for each processed dataset, highlighting potential inter-dataset differences in EV charging patterns, network sizes, and load characteristics which may affect forecasting difficulty and influence model performance. 
+% These datasets have been previously utilized in prior EVCS research, including \cite{journal/tits2023/24huang} demonstrating their value for diverse research aims within this domain. 
+
+\begin{table}[t!]
+	\centering
+	\caption{The statistics of charging load datasets.}
+    \vspace{-8pt}
+	\resizebox{1\linewidth}{!}{
+		\begin{tabular}{cccccc}
+			\toprule
+			\textbf{Area}  & \textbf{Time range} & \makecell[c]{\textbf{Number of} \\ \textbf{stations}} & \makecell[c]{\textbf{Average} \\ \textbf{load} \\ ($kW$)} & \makecell[c]{\textbf{Peak} \\ \textbf{load} \\ ($kW$)} & \makecell[c]{\textbf{Standard} \\ \textbf{deviation} \\ ($kW$)} \\
+			\midrule
+			PALO  & 2016/01/01--2017/08/01 & 27    & 1.865  & 18.645  & 2.080  \\
+			Boulder & 2022/01/01--2023/06/22 & 40    & 0.525  & 15.892  & 1.166  \\
+			Korea & 2021/09/30--2022/09/30 & 14    & 10.351  & 147.424  & 10.437  \\
+			\bottomrule
+		\end{tabular}%
+	}
+        \vspace{-18pt}
+        \label{table:statistical}%
+\end{table}%
+
+%\subsection{Experimental Settings}
+
+%\subsubsection{Performance Metrics}
+%To evaluate the performance of various methods and proposed CADGN in multi-step charging load forecasting, three metrics are employed: mean absolute error (MAE), root mean square error (RMSE), and mean absolute percentage error (MAPE). MAE measures average errors, RMSE emphasizes larger errors, and MAPE provides a normalized error measure, making these metrics comprehensive for model evaluation. 
+% The definitions for these metrics are provided as follows:
+% \begin{equation}
+	% 	\begin{aligned}
+		% 		\text{MAE} = \frac{1}{N_S N_T} \sum_{i=1}^{N_S} \sum_{j=1}^{N_T} |\hat{X}^{i,j} - X^{i, j}|,
+		% 	\end{aligned}
+	% \end{equation}
+% \begin{equation}
+	% 	\begin{aligned}
+		% 		\text{RMSE} = \sqrt{\frac{1}{N_S N_T} \sum_{i=1}^{N_S} \sum_{j=1}^{N_T} (\hat{X}^{i,j} - X^{i, j})^2},
+		% 	\end{aligned}
+	% \end{equation}
+% \begin{equation}
+	% 	\begin{aligned}
+		% 		\text{MAPE} = \frac{100\%}{N_S N_T} \sum_{i=1}^{N_S} \sum_{j=1}^{N_T} \left| \frac{\hat{X}^{i,j} - X^{i, j}}{X_{i, j} + \epsilon} \right|,
+		% 	\end{aligned}
+	% \end{equation}
+% where $\hat{X}^{i,j}$ and $X^{i,j}$ represent the predicted and actual values at station $i$ and time step $j$, respectively. $N_S$ is the total number of stations, $N_T$ is the total number of time steps, and $\epsilon$ is a small constant to prevent division by zero. Lower values of these metrics indicate higher accuracy in forecasting.
+
+%\subsubsection{Implementation Details}
+%The experiment was conducted using an NVIDIA Tesla V100 16GB GPU. All models were implemented in the PyTorch v1.13.1 framework with the Adam \cite{conference/iclr2015/Diederik} used as the optimizer. The review window size of all models was set to $\mathcal{T}=72$h (3 days) for fair comparison and the prediction steps were $n_T = \{3\text{h}, 6\text{h}, 12\text{h}\}$. The initial learning rate was 0.001, batch size was 32, and the number of epochs was 100, and early termination was used where applicable. For each dataset, we take 70\% data as train set, 10\% data as validation set and the rest as test set. Every experiment is repeated 5 times and the average per formance is reported.
+
+\vspace{-7pt}
+\subsection{Experimental Settings}
+
+In this study, three commonly used metrics in the time series forecasting domain are adopted:  Mean Absolute Error (MAE),  Root Mean Squared Error (RMSE), and Mean Absolute Percentage Error (MAPE). The experiments are implemented within the PyTorch framework (version 1.13.1). All models were conducted using an NVIDIA RTX A6000 with 48GB of memory. Adam optimizer is employed for training all models. 
+\hl{The hyperparameter settings for CADGN and the baseline models are optimized using a grid search strategy, which evaluates a range of values for key parameters. The detailed hyperparameter search space and the optimal configurations for CADGN and the baseline models are presented in Appendix B, Table \ref{table:parameter_settings}.}
+The review window size $N_T$ of all models was set to $72$h (3 days) for a fair comparison. The initial learning rate was 0.001, batch size was 32. Model training is conducted for a maximum of 100 epochs. Early stopping mechanisms are implemented, particularly for deep learning baselines prone to overfitting, based on monitoring validation performance. The predictive horizons evaluated are 3, 6, and 12 hours ahead, reflecting the need for both short-term and mid-term EVCS load predictions for grid operational and planning applications.  
+% For each dataset, we take 70\% data as train set, 10\% data as validation set and the rest as test set. 
+% To further enhance the reliability and statistical significance of the reported results, every experiment, encompassing both baseline and CADGN evaluations across various parameter settings and forecasting horizons, is meticulously repeated 5 times with varying random initializations of model weights. The averaged performance across these multiple runs is then computed and presented in subsequent results tables and analysis.  
+To ensure reliable and statistically significant results, each experiment, including baseline and CADGN evaluations across different parameters and forecasting horizons, is repeated 5 times with varying random model weight initializations. The average performance from these runs is presented in the results.
+
+% To rigorously evaluate the performance and demonstrate the benefits of the proposed CADGN model for multi-step EVCS load forecasting,  the following subsections detail the evaluation metrics and the comprehensive implementation details employed in the experimental setup. The selection of appropriate performance measures and a robust implementation process are crucial for providing meaningful and reliable conclusions from the empirical evaluations. 
+
+% This section provides the evaluation metrics and the comprehensive implementation details employed in the experimental setup.
+% 
+% \subsubsection{Performance Metrics}
+%% Evaluating forecasting model performance requires metrics that capture various facets of accuracy and reflect the model's ability to generalize across different temporal horizons and dataset characteristics. 
+% In this study, three commonly used metrics in the time series forecasting domain are adopted:  Mean Absolute Error (MAE),  Root Mean Squared Error (RMSE), and Mean Absolute Percentage Error (MAPE). These metrics, representing different aspects of forecasting errors, are formally defined as follows:
+% \begin{equation}
+% 	\text{MAE} = \frac{1}{N_S \mathcal{N}_P} \sum_{i=1}^{N_S} \sum_{j=1}^{\mathcal{N}_P} |\hat{X}^{i,j} - X^{i, j}|,
+% 	\label{eq:mae}
+% \end{equation}
+% \begin{equation}
+% 	\text{RMSE} = \sqrt{\frac{1}{N_S \mathcal{N}_P} \sum_{i=1}^{N_S} \sum_{j=1}^{\mathcal{N}_P} (\hat{X}^{i,j} - X^{i, j})^2},
+% 	\label{eq:rmse}
+% \end{equation}
+% \begin{equation}
+% 	\text{MAPE} = \frac{100\%}{N_S \mathcal{N}_P} \sum_{i=1}^{N_S} \sum_{j=1}^{\mathcal{N}_P} \left| \frac{\hat{X}^{i,j} - X^{i, j}}{X_{i, j} + \epsilon} \right|, 
+% 	\label{eq:mape}
+% \end{equation} 
+% where $\hat{X}^{i,j}$ represents the load prediction for EVCS $i$ at time step $j$, $X^{i,j}$ is the corresponding ground truth load value,  $N_S$ represents the total number of charging stations in the dataset, and  $\mathcal{N}_P$ is the total number of forecasting steps. The constant parameter $\epsilon$ is set to $10^{-1}$ and added to the denominator in MAPE to mitigate the potential for division by zero.
+
+%The three chosen metrics collectively provide a robust view of model performance. MAE gives equal weight to all errors, representing the average prediction deviation from ground truth, regardless of direction (overestimation or underestimation).  RMSE, sensitive to outliers and large errors due to its squared terms, penalizes larger forecast deviations more strongly, emphasizing accurate performance during high-load situations. MAPE, a normalized metric,  is particularly insightful when comparing models across diverse datasets as it represents forecast error as a percentage of actual load values, allowing for a relative evaluation. Lower values for all these metrics consistently signify higher prediction accuracy.  
+
+% \subsubsection{Implementation Details}
+% The experiments in this paper are implemented within the PyTorch framework (version 1.13.1), a popular choice for its versatility and efficiency in deep learning. Leveraging the power of a modern graphics processing unit (GPU) — specifically,  an NVIDIA RTX A6000 with 48GB of memory — computations are expedited, enhancing the feasibility of training complex neural network architectures and conducting extensive evaluations across diverse datasets and experimental setups.  A widely adopted optimization algorithm in deep learning, Adam \cite{conference/iclr2015/Diederik} is employed for training all models. Adam’s adaptive learning rate adjustment mechanism is particularly effective for training networks with numerous parameters, ensuring efficient optimization.  A consistent review window, spanning  $N_T=72$ hours (corresponding to three days of historical load data) is set for both CADGN and baseline models, facilitating a fair comparison by ensuring that each model has access to the same historical information when generating forecasts. This duration was determined based on a preliminary investigation suggesting a three-day historical window is generally sufficient to capture relevant patterns and temporal dependencies for this EVCS forecasting task. The predictive horizons evaluated are 3, 6, and 12 hours ahead, reflecting the need for both short-term and mid-term EVCS load predictions for grid operational and planning applications. 
+% 
+% Initialization of model training proceeds with a learning rate set at 0.001, empirically observed to facilitate stable training in preliminary experiments across diverse models. The mini-batch size,  influencing the frequency of weight updates,  is fixed at 32,  offering a suitable trade-off between training speed and efficient memory usage given the resources employed. Model training is conducted for a maximum of 100 epochs.  Early stopping mechanisms are implemented, particularly for deep learning baselines prone to overfitting, based on monitoring validation performance. To further enhance the reliability and statistical significance of the reported results, every experiment, encompassing both baseline and CADGN evaluations across various parameter settings and forecasting horizons, is meticulously repeated 5 times with varying random initializations of model weights.   The averaged performance across these multiple runs is then computed and presented in subsequent results tables and analysis.  
+
+\vspace{-10pt}
+\subsection{Multi-step Point Estimation for EVCS Loads}
+
+% This section compare the proposed CADGN to several widely adopted baselines. 
+This subsection presents a quantitative analysis of the multi-step ahead forecasting performance for the proposed CADGN model and a comprehensive set of baseline models.
+Dlinear \cite{zeng2023transformers} is a novel lightweight forecasting method. GRU \cite{conference/emnlp2014/1724Cho} is a commonly used technique for sequence data learning. 
+As for multivariate time series forecasting, we selected advanced models including Informer \cite{conference/aaai2021/11106Zhou} (Inf.), Crossformer \cite{conference/iclr2023/zhang} (Cross.), PatchTST \cite{conference/iclr2023/NieNSK23}, and NHiTS \cite{conference/aaai2023/ChalluOORCD23}, all of which have been applied to load forecasting tasks previously.
+Additionally, we incorporated several typical graph neural networks for comparison: GAIN \cite{journal/energy2023/278Wang}, MAGNet \cite{journal/tkde2023/10Chen}, AGCRN \cite{conference/nips2020/33bai}, and Graph WaveNet \cite{conference/ijcai2019/1907Wu} (GWN). Among these, GAIN and Graph WaveNet are widely used in load forecasting. MAGNet and AGCRN focus on pivotal nodes in graph learning, aligning closely with our approach.
+
+% This subsection presents a quantitative analysis of the multi-step ahead forecasting performance for the proposed CADGN model and a comprehensive set of baseline models. These baseline models represent diverse approaches to time-series forecasting, offering a representative comparison against state-of-the-art methods and demonstrating the advancements achieved through the integration of causality and critical node analysis within CADGN. The baselines employed for evaluation include:
+% \begin{itemize}
+	%     \item \textbf{Gated Recurrent Unit (GRU):} A widely used variant of Recurrent Neural Networks, the GRU is designed for capturing temporal dependencies within sequences \cite{Cho2014LearningPR}. GRU's simpler architecture compared to Long Short-Term Memory (LSTM) models can offer benefits in training efficiency and resource usage, making it suitable for large-scale time series data.
+	%     \item \textbf{Informer:} A relatively recent advancement in the Transformer model family, the Informer architecture [Citation: Informer (Zhou et al., AAAI 2021?)] leverages self-attention mechanisms to capture both local and global dependencies in time series. Its long-range forecasting capabilities, demonstrated in diverse forecasting tasks, provide a relevant benchmark for CADGN.
+	%     \item \textbf{Crossformer:} A Transformer-based architecture tailored for time-series forecasting. The Crossformer model employs a combination of self-attention and cross-attention mechanisms, allowing for greater expressiveness in modeling the complex interplay between encoder (past data) and decoder (future forecasts) components [Citation: Crossformer].
+	%     \item \textbf{DLinear:} A simplified forecasting method that linearly projects past temporal patterns to make predictions about the future. Although less complex than deep learning models, its efficiency and ease of implementation makes it valuable as a preliminary assessment of forecasting performance.
+	%     \item \textbf{PatchTST:} PatchTST [Citation: PatchTST] integrates ideas from both the Vision Transformer and Time Series Transformer literature to capture temporal dependencies through locally-focused attention mechanisms (using patches). It is recognized for its capability to model high-frequency temporal variations, which is beneficial in EVCS load prediction with hourly fluctuations.
+	%     \item \textbf{N-HiTS:} A hierarchical Transformer model tailored specifically for long-range forecasting, N-HiTS [Citation: N-HiTS] employs nested levels of attention to capture hierarchical relationships within time series data, allowing for more nuanced modeling of seasonality and periodicities present in data like EVCS load profiles.
+	%     \item \textbf{Generative Adversarial Network (GAIN):} A model based on the Generative Adversarial Networks framework \cite{Goodfellow2014GenerativeAN}, GAIN is designed for efficiently imputing missing data values, particularly for time-series [Citation: Time-Series GAIN]. It was included as a potential way to alleviate data sparsity challenges in some EVCS datasets.
+	%     \item \textbf{MAGNet:} This Multi-Horizon Attention Graph Neural Network \cite{Wu2021ConnectingTF} was designed for traffic forecasting. It offers a compelling baseline for EVCS prediction as it combines graph convolution to capture spatial relationships with a hierarchical attention mechanism to model multi-horizon (temporal) interactions, allowing a direct assessment of the performance gains obtained from the more specialized causality graph learning and critical node emphasis within CADGN.
+	%     \item \textbf{AGCRN:} An Adaptive Graph Convolutional Recurrent Network [Citation: AGCRN], the AGCRN combines GNN with RNN structures, offering another approach for capturing both spatial and temporal dependencies in EVCS load patterns, making it a valuable comparison point for highlighting the effectiveness of the novel modeling strategies within CADGN.
+	%     \item \textbf{Graph WaveNet:} This graph-based deep learning method uses dilated causal convolutions alongside graph convolutional operations [Citation: Graph Wavenet]. It was incorporated due to its success in handling complex spatial-temporal dependencies in diverse domains, offering insights into the effectiveness of explicitly modeling causal relationships using graph structures within the context of EVCS load forecasting.
+	% \end{itemize}
+
+
+
+\begin{table*}[htbp]
+	\centering
+	\small
+	\caption{Forecast results with 72 review window and prediction length \{3, 6, 12\}. The best result is in bold, followed by underlining.}
+    \vspace{-8pt}
+	\resizebox{0.8\textwidth}{!}{
+		\begin{tabular}{cccccccccccccc}
+			\toprule
+			\toprule
+			\textbf{Area}  & \textbf{Steps} & \textbf{Metrics} & \textbf{GRU}   & \textbf{Inf.}  & \textbf{Cross.} & \textbf{Dlinear} & \textbf{PatchTST} & \textbf{NHiTS} & \textbf{GAIN}  & \textbf{MAGNet} & \textbf{AGCRN} & \textbf{GWN}   & \cellcolor{tablegray}\textbf{CADGN} \\
+			\midrule
+			\multirow{9}[6]{*}{\begin{sideways}Boulder\end{sideways}} & \multirow{3}[2]{*}{3} & MAE   & 0.647  & 0.672  & 0.648  & 0.571  & \underline{0.535 } & 0.534  & 0.682  & 0.546  & 0.561  & 0.555  & \cellcolor{tablegray}\textbf{0.530 } \\
+			&       & RMSE  & 1.391  & 1.456  & 1.294  & \underline{1.217 } & 1.203  & 1.214  & 1.394  & \textbf{1.199 } & 1.257  & 1.205  & \cellcolor{tablegray}1.222  \\
+			&       & MAPE & 2.717  & 2.720  & 3.225  & 2.714  & 2.396  & \underline{2.287 } & 3.256  & 2.492  & 2.411  & 2.549  & \cellcolor{tablegray}\textbf{2.109 } \\
+			\cmidrule{2-14}          & \multirow{3}[2]{*}{6} & MAE   & 0.696  & 0.735  & 0.713  & 0.655  & 0.627  & 0.633  & 0.762  & \underline{0.612 } & 0.657  & 0.665  & \cellcolor{tablegray}\textbf{0.610 } \\
+			&       & RMSE  & 1.483  & 1.542  & 1.382  & 1.338  & \underline{1.321 } & 1.327  & 1.511  & \textbf{1.315 } & 1.374  & 1.331  & \cellcolor{tablegray}1.326  \\
+			&       & MAPE & 2.856  & 3.095  & 3.628  & 3.145  & 2.955  & 2.921  & 3.600  & \underline{2.726 } & 3.025  & 3.318  & \cellcolor{tablegray}\textbf{2.602 } \\
+			\cmidrule{2-14}          & \multirow{3}[2]{*}{12} & MAE   & 0.719  & 0.726  & 0.705  & 0.688  & 0.667  & 0.666  & 0.723  & \underline{0.656 } & 0.671  & 0.699  & \cellcolor{tablegray}\textbf{0.644 } \\
+			&       & RMSE  & 1.505  & 1.532  & 1.409  & 1.371  & 1.376  & 1.367  & 1.482  & \textbf{1.362 } & 1.404  & 1.370  & \cellcolor{tablegray}1.363  \\
+			&       & MAPE & 3.052  & 2.962  & 3.286  & 3.424  & 3.161  & 3.196  & 3.251  & \underline{2.959 } & 3.016  & 3.630  & \cellcolor{tablegray}\textbf{2.862 } \\
+			\midrule
+			\multirow{9}[6]{*}{\begin{sideways}Palo\end{sideways}} & \multirow{3}[2]{*}{3} & MAE   & 1.333  & 1.343  & 1.290  & 1.249  & 1.252  & 1.246  & 1.304  & 1.214  & \underline{1.193 } & 1.288  & \cellcolor{tablegray}\textbf{1.189 } \\
+			&       & RMSE  & 1.926  & 1.953  & 1.850  & \underline{1.794 } & 1.800  & 1.798  & 1.910  & 1.768  & 1.798  & 1.799  & \cellcolor{tablegray}\textbf{1.746 } \\
+			&       & MAPE & 4.618  & 4.616  & 4.761  & 4.409  & 4.407  & 4.320  & 4.329  & 4.081  & \underline{3.873 } & 5.104  & \cellcolor{tablegray}\textbf{3.869 } \\
+			\cmidrule{2-14}          & \multirow{3}[2]{*}{6} & MAE   & 1.355  & 1.402  & 1.390  & 1.356  & \underline{1.300 } & 1.307  & 1.503  & 1.304  & 1.317  & 1.356  & \cellcolor{tablegray}\textbf{1.274 } \\
+			&       & RMSE  & 1.971  & 2.028  & 1.925  & 1.911  & \textbf{1.850 } & 1.870  & 2.193  & 1.862  & 1.889  & 1.895  & \cellcolor{tablegray}\textbf{1.850 } \\
+			&       & MAPE & 4.540  & 4.725  & 5.566  & 4.878  & 4.665  & 4.735  & 5.018  & \underline{4.528 } & 4.591  & 5.099  & \cellcolor{tablegray}\textbf{4.257 } \\
+			\cmidrule{2-14}          & \multirow{3}[2]{*}{12} & MAE   & 1.377  & 1.406  & \underline{1.303 } & 1.357  & 1.336  & 1.311  & 1.497  & 1.336  & 1.341  & 1.356  & \cellcolor{tablegray}\textbf{1.283 } \\
+			&       & RMSE  & 1.998  & 2.037  & 1.887  & 1.904  & 1.896  & \underline{1.885 } & 2.108  & 1.893  & 1.928  & 1.901  & \cellcolor{tablegray}\textbf{1.880 } \\
+			&       & MAPE & 4.646  & 4.749  & \underline{4.375 } & 4.959  & 4.794  & 4.690  & 5.327  & 4.714  & 4.750  & 5.048  & \cellcolor{tablegray}\textbf{4.021 } \\
+			\midrule
+			\multirow{9}[6]{*}{\begin{sideways}Korea\end{sideways}} & \multirow{3}[2]{*}{3} & MAE   & 7.146  & 7.839  & 6.745  & 6.612  & 6.562  & 6.601  & 6.842  & \textbf{6.378 } & 6.587  & 6.438  & \cellcolor{tablegray}\underline{6.380 } \\
+			&       & RMSE  & 11.526  & 12.680  & 11.411  & 11.033  & 10.965  & 11.108  & 11.341  & 10.768  & 11.055  & \underline{10.787 } & \cellcolor{tablegray}\textbf{10.710 } \\
+			&       & MAPE & 12.807  & 13.850  & 10.348  & 10.445  & 10.194  & 10.246  & 11.531  & \textbf{9.792 } & 10.413  & 10.246  & \cellcolor{tablegray}\underline{9.869 } \\
+			\cmidrule{2-14}          & \multirow{3}[2]{*}{6} & MAE   & 7.553  & 7.831  & 7.555  & 7.090  & 7.170  & 7.294  & 7.797  & 7.062  & 8.031  & \underline{6.984 } & \cellcolor{tablegray}\textbf{6.891 } \\
+			&       & RMSE  & 12.031  & 12.643  & 12.404  & 11.510  & 11.652  & 11.777  & 12.874  & 11.465  & 12.700  & \underline{11.405 } & \cellcolor{tablegray}\textbf{11.349 } \\
+			&       & MAPE & 13.864  & 13.540  & 11.694  & 11.869  & 11.863  & 13.133  & 12.356  & 12.475  & 14.558  & \underline{11.825 } & \cellcolor{tablegray}\textbf{10.878 } \\
+			\cmidrule{2-14}          & \multirow{3}[2]{*}{12} & MAE   & 7.791  & 7.895  & 7.859  & 7.347  & 7.393  & 7.857  & 8.011  & 7.507  & 7.914  & \underline{7.339 } & \cellcolor{tablegray}\textbf{7.334 } \\
+			&       & RMSE  & 12.558  & 12.780  & 12.732  & 11.821  & 11.867  & 12.321  & 12.967  & 11.958  & 12.725  & \textbf{11.798 } & \cellcolor{tablegray}\underline{11.820 } \\
+			&       & MAPE & 13.469  & 13.563  & 12.980  & \underline{12.823 } & 12.938  & 15.313  & 13.314  & 13.818  & 13.702  & 13.165  & \cellcolor{tablegray}\textbf{12.585 } \\
+			\bottomrule
+			\bottomrule
+		\end{tabular}%
+	}
+        \vspace{-18pt}
+	\label{table:point}%
+\end{table*}%
+Table \ref{table:point} summarizes the results for each model and dataset combination, MAE, RMSE, and MAPE at 3-hour, 6-hour, and 12-hour prediction horizons. 
+Quantitative evaluation reveals that CADGN demonstrates consistently strong performance, frequently exceeding, or at a minimum equaling, the accuracy of the baseline models across the majority of the evaluated forecasting scenarios. This superior performance is demonstrably evident in the often lower MAE and RMSE values achieved by CADGN, indicating its capacity for generating more precise EVCS load predictions, particularly for mid-term forecasting horizons (6 and 12 hours). 
+Among the advanced models for multivariate time series forecasting, Informer, Crossformer, PatchTST, and NHiTS demonstrated varying degrees of success. However, none consistently outperformed CADGN, particularly on longer forecasting horizons. GNN-based models, including GAIN, MAGNet, AGCRN, and GWN, are notable for their application in load forecasting. Despite their strengths, these models were consistently outperformed by CADGN, which leveraged causality-aware components and dynamic graph structures to better capture the underlying data relationships.
+These observations lend empirical support to our initial hypothesis: integrating both causality awareness and a dynamic focus on critical EVCS network interactions facilitates the modeling of complex interdependencies, often neglected by traditional methods and conventional GNN models. 
+
+% Notably, the most substantial performance improvements attributed to CADGN are observed in the context of the Korea dataset, characterized by both a greater number of EVCS and more substantial load variation. This suggests that as network complexities increase and load dynamics become more heterogeneous, the explicit modeling of causal relationships, enabled through CAGLM, and the prioritization of influential EVCS captured by CRGLM,  provide increasingly valuable benefits. These observations lend empirical support to our initial hypothesis: integrating both causality awareness and a dynamic focus on critical EVCS network interactions facilitates the modeling of complex interdependencies, often neglected by traditional methods and conventional GNN models. 
+
+Furthermore, as the prediction horizon is extended, all forecasting methods predictably exhibit diminished accuracy, reflected by an overall increase in the evaluated metrics. However,  the degradation in performance for CADGN is observed to be consistently less pronounced in comparison to the other baseline approaches. This robustness across various conditions highlights CADGN's effectiveness and adaptability, thus offering valuable advantages in scenarios demanding greater predictive horizons.
+ 
+% Furthermore, as the prediction horizon is extended, all forecasting methods predictably exhibit diminished accuracy, reflected by an overall increase in the evaluated metrics. However,  the degradation in performance for CADGN is observed to be consistently less pronounced in comparison to the other baseline approaches. This more stable performance at increased horizons provides additional empirical validation for the value of the causal insights and the strategic emphasis on critical EVCS interactions. CADGN’s capacity to model and leverage these deeper relationships equips it with a more robust capability to cope with growing forecast uncertainty and evolving network dynamics, thus offering valuable advantages in scenarios demanding greater predictive horizons. A minor, yet notable,  trend observed is the slightly reduced forecast errors for the Boulder dataset across various models and prediction horizons. While requiring further analysis, this disparity potentially highlights dataset-specific differences in load predictability influenced by varying network complexities, user behavioral patterns, or inherent load characteristics, offering avenues for further exploration in future work.  
+
+% The quantitative evaluation strongly supports the potential of CADGN for accurately capturing intricate load dynamics and enhancing the accuracy of EVCS load forecasting. These preliminary results suggest that CADGN’s novel framework, by explicitly accounting for causality and focusing on dynamically changing relationships between critical EVCS, can better capture nuanced, often hidden, relationships in EVCS load patterns. Further investigation into the individual contributions and behavior of constituent CADGN modules is detailed in subsequent sections. 
+\vspace{-10pt}
+\subsection{Ablation Study}
+To thoroughly investigate the contribution of each individual component within CADGN to the improved overall model performance, a comprehensive ablation study is conducted. Four distinct model variants are meticulously designed, strategically removing specific elements while maintaining the core framework of the network:  
+\textbf{1) \textit{w/o}-TEM}: The temporal masking component implemented within CAGLM and CRGLM are deactivated, allowing an assessment of the impact of data augmentation through temporal masking on model generalization.
+\textbf{2) \textit{w/o}-CRG}: This variant entirely removes the CRGLM from the architecture,  allowing for the investigation into the performance impact of modeling dynamically changing relationships between the identified critical EVCS nodes.
+\textbf{3) \textit{w/o}-IR}: Both the local representations $\bm{H}^{(local)}$ within CAGLM and CRGLM are removed. This study examines the necessity of representing local, non-causal, temporal trends alongside global graph structure information.
+\textbf{4) \textit{w/o}-CAG}: In this variant, the entire CAGLM is removed, enabling the study of the necessity for causal inference to the model's overall performance.
+
+% \begin{itemize}
+	%     \item  \textbf{CADGN w/o Temporal Masking:}  In this variant, the temporal masking procedure implemented within CAGLM, as described in Eq.(\ref{eq:temporal_masking}),  is deactivated, allowing an assessment of the impact of data augmentation through temporal masking on model generalization.
+	%     \item  \textbf{CADGN w/o CRGLM:}   This variant entirely removes the Critical Relationship Graph Learning Module (CRGLM) from the architecture, allowing for the investigation into the performance impact of modeling dynamically changing relationships between the identified influential (``critical'') EVCS nodes. The direct incorporation of $\bm{H}_{ca}^{(o)}$  from the CAGLM  into the output layer is also deactivated for consistency.
+	%     \item  \textbf{CADGN w/o Local Temporal Information}:  Here,  both the multi-layer perceptron (MLP) used to create $\bm{H}^{(local)}$  within CAGLM, as well as the inclusion of  $\bm{H}_{ca}^{(o)}$  from the CAGLM within CRGLM (shown in Fig. \ref{fig:CRGLM} and \ref{fig:TRFM}), are removed, enabling the study of the necessity for representing local, non-causal, temporal trends alongside the globally causal information.
+	%     \item   \textbf{CADGN w/o CAGLM}:  In this variant, the entire Causality-Aware Graph Learning Module (CAGLM) is removed. By removing both the causality graph discovery component (Eq.(\ref{eq:causal_discovery})) and the convolution based on this graph, the study examines the contribution of causal inference to the model's overall performance.  The CRGLM component directly receives the input  $\bm{X}_{m}^{t_{b}: t_{e}}$ in this setting for consistent input.
+	% \end{itemize}
+
+The performance of each CADGN variant, evaluated on the three datasets using the same setup as in the previous experiment, is meticulously documented and compared to the performance of the full CADGN model (reported in Table \ref{table:point}). Table  \ref{table:ablation} summarizes the results for all the variant model configurations, enabling in-depth insights into the role and importance of each module within the overall network design. 
+\begin{table}[t!]
+	\centering
+	\caption{Performance of ablation study. The best result is in bold, followed by underlining.}
+    \vspace{-8pt}
+	\resizebox{1\linewidth}{!}{
+		\begin{tabular}{ccccccc}
+			\toprule
+			\toprule
+			\textbf{Area}  & \textbf{Metrics} & \cellcolor{tablegray}\textbf{CADGN} & \textbf{w/o-TEM} & \textbf{w/o-CRG} & \textbf{w/o-IR} & \textbf{w/o-CAG} \\
+			\midrule
+			\multirow{3}[2]{*}{Boulder} & MAE   & \cellcolor{tablegray}\textbf{0.530 } & 0.535  & 0.541  & \underline{0.534 } & 0.541  \\
+			& RMSE  & \cellcolor{tablegray}\underline{1.222 } & 1.227  & 1.226  & \textbf{1.218 } & 1.228  \\
+			& MAPE  & \cellcolor{tablegray}\textbf{2.109 } & \underline{2.165 } & 2.269  & 2.193  & 2.281  \\
+			\midrule
+			\multirow{3}[2]{*}{Palo} & MAE   & \cellcolor{tablegray}\textbf{1.189 } & \underline{1.207 } & 1.229  & 1.208  & 1.209  \\
+			& RMSE  & \cellcolor{tablegray}\textbf{1.746 } & \underline{1.762 } & 1.791  & \underline{1.762 } & 1.763  \\
+			& MAPE  &\cellcolor{tablegray} \textbf{3.869 } & 3.977  & \underline{3.920 } & 4.268  & 3.947  \\
+			\midrule
+			\multirow{3}[2]{*}{Korea} & MAE   & \cellcolor{tablegray}\textbf{6.380 } & \underline{6.400 } & 6.531  & 6.504  & 6.418  \\
+			& RMSE  & \cellcolor{tablegray}\textbf{10.710 } & \underline{10.743 } & 10.817  & 10.886  & 10.752  \\
+			& MAPE  & \cellcolor{tablegray}\underline{9.869 } & \textbf{9.865 } & 10.536  & 10.163  & 10.066  \\
+			\bottomrule
+			\bottomrule
+		\end{tabular}%
+	}
+        \vspace{-18pt}
+	\label{table:ablation}%
+\end{table}%
+The ablation study results presented in Table \ref{table:ablation} reveal that the full CADGN model consistently achieves the highest EVCS load forecasting performance, emphasizing the synergy of its components. The most notable observation is that the exclusion of the Critical Relationship Graph Learning Module (CRGLM) leads to the most significant degradation in performance, with substantial increases in MAE and RMSE across all datasets. This underscores the importance of dynamically focusing on critical EVCS interactions, which CRGLM effectively captures, providing valuable insights for improving load prediction accuracy. This crucial role of CRGLM resonates with our hypothesis regarding the significance of capturing critical EVCS dynamics for improved forecasting.
+
+Additionally, the CAGLM is also essential for capturing causal relationships, though the removal of its temporal masking feature showed minor effects. This suggests that while CAGLM's causal inference is crucial, the specific implementation details like temporal masking may vary in importance depending on the dataset's characteristics, such as its robustness to noise and variability in historical data patterns. These ablation results clearly demonstrate that incorporating causal inference (through CAGLM) and modeling dynamic critical EVCS relationships (via CRGLM) individually enhances predictive performance, and together, these modules work in conjunction to achieve superior and robust forecasting accuracy, validating the key arguments and motivations for this work.
+
+% The ablation study results presented in Table \ref{table:ablation} reveal that the full CADGN model consistently achieves the highest EVCS load forecasting performance. This finding emphasizes that the model, when incorporating all of its carefully engineered modules, harnesses the individual contributions of each component synergistically, resulting in improved predictive accuracy across diverse geographical locations. The most noteworthy observation in Table \ref{table:ablation} is that the exclusion of the CRGLM, denoted by ``CADGN w/o CRGLM'', consistently leads to the most significant degradation in performance, as evidenced by the substantial increase in all three metrics for every dataset. The absence of CRGLM consistently resulted in greater MAE and RMSE scores compared to the full CADGN model, suggesting that dynamically focusing on critical EVCS interactions through the CRGLM module provides particularly impactful insights that improve load prediction accuracy.   
+
+% This crucial role of CRGLM resonates with our hypothesis regarding the significance of capturing critical EVCS dynamics for improved forecasting.   This trend becomes increasingly apparent in the Korea dataset, suggesting that larger-scale or more heterogeneous EVCS networks benefit greatly from this targeted approach. Further, it is observed that the impact of removing temporal masking in CAGLM (``CADGN w/o Temporal Masking'') appears to have a minor, often negligible effect, potentially indicating that this specific form of data augmentation is not always crucial and depends on factors like the dataset's robustness to noise or inconsistencies and the extent of variations within the historical data patterns. 
+
+% These ablation results clearly demonstrate that incorporating causal inference (through CAGLM) and modeling dynamic critical EVCS relationships (via CRGLM) individually enhances predictive performance, and together, these modules work in conjunction to achieve superior and robust forecasting accuracy, validating the key arguments and motivations for this work.  Future investigations could explore alternative causal inference algorithms, refine critical node selection mechanisms, and analyze performance across a broader array of EV charging networks to further enhance the efficacy and insights gained through CADGN's integrated approach.
+
+\vspace{-8pt}
+\subsection{Parameter Sensitivity Analysis}
+\label{subsec:psa}
+
+This part evaluates the impact of key CADGN parameters affect the model's forecasting accuracy and efficiency, highlighting sensitivities that can guide model tuning. Specifically, the investigation centers on: 
+1) temporal delay window size $T_d$ used during critical node identification in Eq.(\ref{eq:cri_e}). This parameter reflects the duration of past data used to assess EVCS relationships.
+2) Data masking ratio $R_d$ used in Eq.(\ref{eq:temporal_masking}). This parameter, ranging from 0.1 to 1, determines the probability of masking individual load values within CAGLM’s and CRGLM input, assessing the impact of data augmentation.
+3) Top-k Node selection ratio $R_d$ for CRGLM used in Eq.(\ref{eq:critical_nodes}). This ratio dictates the fraction of all EVCS selected as “critical” nodes within the network.
+
+% Figure \ref{figure:sensitivity_patch}(a) displays the effect of varying  $ T_d $, the delay window for identifying critical nodes, on both MAE (red curve) and RMSE (blue curve). Notably, the curves demonstrate a noticeable rise in both MAE and RMSE beyond  $  log_2(T_d)  =  3  $. This suggests that an overly expansive temporal delay window negatively impacts forecasting accuracy, likely capturing spurious or less-relevant relationships between EVCS from distant past observations. Conversely, employing shorter temporal windows appears to facilitate sharper critical node identification and maintain higher predictive accuracy.  
+
+Fig. \ref{figure:sensitivity_patch}(a) illustrates the effect of varying $T_d$ on MAE (red curve) and RMSE (blue curve). Both metrics rise significantly when $log_2(T_d)$ exceeds 3, indicating that a longer temporal delay window may capture irrelevant relationships, thereby reducing accuracy. Conversely, employing shorter temporal windows appears to facilitate sharper critical node identification and maintain higher predictive accuracy.  
+
+% Analyzing Figure \ref{figure:sensitivity_patch}(b), which investigates the influence of $ R_d $,  the data masking ratio used within CAGLM,  we observe relatively stable MAE (red curve) and RMSE (blue curve) across the explored range, with the Korea dataset generally exhibiting more sensitivity to changes in $ R_d $  than the other two datasets. This relative robustness indicates that CADGN remains comparatively resilient to missing information or masked inputs during the causality learning phase, while hinting that datasets with higher overall variation in loads might benefit from tuning  $ R_d $ to attain further performance gains. 
+
+Fig. \ref{figure:sensitivity_patch}(b) investigates the influence of $R_d$ on MAE and RMSE. We observe relatively stable MAE (red curve) and RMSE (blue curve) across the explored range. This relative robustness indicates that CADGN remains comparatively resilient to missing information or masked inputs during the causality learning phase, while hinting that datasets with higher overall variation in loads might benefit from tuning  $ R_d $ to attain further performance gains. 
+
+% Figure \ref{figure:sensitivity_patch}(c), depicting the effect of altering the critical node selection ratio  $ R_k $, exhibits an intriguing pattern: Initially, both MAE and RMSE improve slightly as  $ R_k $ is raised to around 0.4. However,  a marked increase in both metrics is observed for $ R_k $   above  0.6. This initial improvement and then degradation suggest that expanding the critical node set to a moderate degree might help capture a more comprehensive view of influential inter-station dependencies,  leading to higher accuracy.  However, an excessively large critical node selection threshold appears detrimental, implying that diminishing returns, and even negative impacts, might arise from treating a disproportionate fraction of the nodes as equally influential, as it obscures the roles played by genuinely vital nodes.
+
+% Focusing on the impact of $ R_k $   on efficiency (inference time in seconds) shown in  Figure \ref{figure:sensitivity_patch}(d),  the inference time exhibits a near-linear increase with larger  $ R_k $  values. This pattern reflects the greater computational cost of GNN calculations when larger graphs are involved. Consequently, balancing $ R_k $ to leverage the benefits of capturing key node interactions with the need for maintaining computationally efficient forecasts becomes essential.   
+
+Fig. \ref{figure:sensitivity_patch}(c) shows that both MAE and RMSE improve as the critical node selection ratio $R_k$ increases to around 0.4, but both metrics rise significantly when $R_k$ exceeds 0.6. This suggests that moderately expanding the critical node set enhances accuracy by capturing key inter-station dependencies, while an overly large set leads to diminishing returns by diluting the influence of genuinely critical nodes. Additionally, as shown in Fig. \ref{figure:sensitivity_patch}(d), inference time increases nearly linearly with larger $R_k$ values, reflecting the higher computational cost of larger graphs. Therefore, balancing $R_k$ is crucial to optimize both accuracy and computational efficiency.
+
+% In summary,  these sensitivity analyses reveal valuable insights for fine-tuning CADGN parameters and comprehending the model's behaviors: (1) employing a moderately sized historical window to discern critical relationships (using  $ T_d $ ), (2) considering a data masking ratio appropriate to the dataset’s inherent load variations (via $ R_d $ ) and (3) selecting an appropriate  $ R_k $  to capture significant node influences while ensuring efficiency, are key strategies to attain optimal forecasting performance with the CADGN framework. 
+
+\begin{figure}[t!]
+	\centering
+	\subfigure[Effect of $T_d$ on MAE and MSE]{\includegraphics[width=0.48\linewidth]{images/delay_mae_rmse.eps}} ~
+	\subfigure[Effect of $R_d$ on MAE and MSE]{\includegraphics[width=0.48\linewidth]{images/mask_mae_rmse.eps}}
+	
+	\subfigure[Effect of $R_k$ on MAE and MSE]{\includegraphics[width=0.48\linewidth]{images/topk_mae_rmse.eps}} ~ 
+	\subfigure[Effect of $R_k$ on efficiency]{\includegraphics[width=0.45\linewidth]{images/topk_time.eps}}
+	\caption{Performance of sensitivity analysis.}
+        \vspace{-10pt}
+	\label{figure:sensitivity_patch}
+\end{figure}
+
+\vspace{-8pt}
+\subsection{\hl{Study of Prediction Performance}}
+
+\begin{figure*}[t!]
+	\centering
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_bo.pdf}
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_bo_2.pdf}
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_bo_3.pdf}
+
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_po.pdf}
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_po_2.pdf}
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_po_3.pdf}
+
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_kr.pdf}
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_kr_2.pdf}
+	\includegraphics[width=0.325\linewidth]{images/predictions_comparision_kr_3.pdf}
+
+	\caption{\hl{Predictions from the proposed CADGN and benchmark models for various scenarios with a 3-hour prediction horizon.}}
+        \vspace{-18pt}
+	\label{figure:prediction_performance}
+\end{figure*}
+
+% \begin{figure}[t!]
+% 	\centering
+% 	\subfigure[$N_P = 3$]{\includegraphics[width=0.32\linewidth]{images/cadgn_total_scatter_step_3.png}}
+% 	\subfigure[$N_P = 6$]{\includegraphics[width=0.32\linewidth]{images/cadgn_total_scatter_step_6.png}}
+% 	\subfigure[$N_P = 12$]{\includegraphics[width=0.32\linewidth]{images/cadgn_total_scatter_step_12.png}}
+% 	\caption{Scatter plots comparing actual and predicted load values of the proposed CADGN.}
+% 	\label{figure:prediction_scatter}
+%         \vspace{-18pt}
+% \end{figure}
+
+\hl{Fig. \ref{figure:prediction_performance} compares the EVCS load forecasting performance of CADGN against benchmark models (GWN, MAGNet, PatchTST) across three datasets. A key challenge in EVCS load forecasting lies in accurately predicting volatile peak demands, which are influenced by sudden fluctuations in user behavior, grid constraints, and time-dependent usage patterns. CADGN consistently demonstrates superior performance by closely tracking actual load trajectories across both high- and low-demand periods. This is especially evident in the Korea dataset, which exhibits more pronounced peaks and troughs compared to the other datasets. In particular, CADGN outperforms the other models in capturing sharp demand surges during peak hours, as highlighted in yellow in Fig. \ref{figure:prediction_performance}.
+This enhanced performance is attributed to CADGN’s unique ability to model both causal relationships (via CAGLM) and the dynamics between critical nodes (through CRGLM), allowing it to effectively capture the complex interdependencies and load fluctuations within EVCS networks. As a result, CADGN achieves an maximum improvement of 6.9\% in MAE over the benchmark models on the Korea dataset, highlighting its superior capacity to provide more accurate predictions across a range of demand scenarios.}
+
+\hl{However, for some particularly extreme data points, the prediction performance remains relatively less accurate. This is primarily due to the inherent unpredictability of extreme events, which are often driven by rare, non-recurring factors such as sudden surges in demand, unexpected grid constraints, or anomalous user behavior patterns. While CADGN is effective in modeling complex dependencies, the stochastic nature of these extreme variations poses a fundamental challenge for any forecasting model. Nevertheless, CADGN still outperforms comparable methods overall, demonstrating superior adaptability across diverse demand scenarios.}
+
+
+% Notably, CADGN consistently demonstrates superior performance by closely tracking the actual load fluctuations, particularly during periods of high demand and low demand. This superior tracking is especially apparent for the Korea dataset, which exhibits more pronounced peaks and troughs, further highlighting CADGN's capability to effectively handle challenging scenarios. CADGN outperforms the benchmarks by an average of 4.7\% in MAE on the Korea dataset.
+
+% Figure \ref{figure:prediction_scatter} further analyzes CADGN's performance by presenting scatter plots comparing actual and predicted loads at different prediction horizons ($N_P = 3$, 6, and 12 hours), aggregated across all three datasets. The included Pearson Correlation Coefficient (PCC) values quantify prediction accuracy. All PCC values are statistically significant at $p < 0.01$, indicating strong positive correlations between predicted and actual loads. 
+% For the short-term horizon ($N_P = 3$), CADGN exhibits a strong positive linear correlation (PCC = 0.883), indicating excellent accuracy in short-term predictions. As the prediction horizon extends, the correlation slightly decreases, reflecting the inherent difficulty of accurately predicting further into the future. However, even at $N_P = 12$, the model maintains a strong correlation (PCC = 0.820), demonstrating CADGN's capacity to capture long-term load trends and variability. This consistent performance across various horizons is attributed to CADGN's unique capability to model both causal relationships (via CAGLM) and the dynamics among critical nodes (through CRGLM).
+
+\subsection{\hl{Study of Model Efficiency}}
+
+\hl{Table \ref{tab:efficiency} summarizes the efficiency comparison between CADGN and benchmark models for a typical instance in a batch learning process, covering training time, GPU memory usage, inference time, MAE, and RMSE. In terms of computational efficiency, CADGN demonstrates superior performance with a training time of 0.025 seconds, significantly outperforming Cross. (5.1× slower), MAGNet (4.3× slower), and AGCRN (16× slower). While PatchTST and GWN train slightly faster (1.1× and 0.4× relative speeds, respectively), CADGN requires the least GPU memory due to CRGLM’s sparse graph representation, which focuses only on critical EVCS nodes, thereby reducing the memory footprint. This efficiency makes CADGN well-suited for large-scale smart grid applications with hardware constraints. 
+Regarding inference time, CADGN ranks in the mid-range, outperforming AGCRN but slightly trailing behind PatchTST. In terms of forecasting accuracy, CADGN surpasses all benchmarks, achieving a relative improvement in MAE ranging from 1.8\% to 8.6\%. The RMSE of 1.363 remains competitive with MAGNet's 1.362 while delivering 4.3× higher training efficiency and reducing memory consumption by 25\% compared to MAGNet.
+Overall, CADGN achieves a strong balance between computational efficiency and prediction accuracy, making it well-suited for hourly or finer-grained EVCS load forecasting.}
+
+% The efficiency comparison of CADGN and benchmark models for a normal mini-batch learning process is summarized in Table \ref{tab:efficiency}, which presents key performance metrics including training time, GPU memory usage, inference time, MAE, and RMSE. In terms of computational efficiency, CADGN demonstrates superior performance with a training time of 0.025 seconds, significantly outperforming Cross. (5.1× slower), MAGNet (4.3× slower), and AGCRN (16× slower). While PatchTST and GWN exhibit marginally faster training times (1.1× and 0.4× relative speeds, respectively), CADGN maintains a advantage in GPU memory utilization, requiring only 1,585 MB – the lowest among all models. This memory efficiency is due to the sparse graph representation used in CRGLM, which merely consider a subset of EVCS as critical nodes and thus reduces the memory footprint.
+% It also prove that the proposed CADGN is advantageous for large-scale smart grid applications with hardware constraints. For inference time, CADGN placing it in the middle range compared to other models, faster than AGCRN but slightly slower than PatchTST. Despite the small difference in inference time, CADGN remains highly efficient in generating predictions with minimal computational overhead. For forecasting accuracy, CADGN outperforming all benchmarks by 1.8\% to 8.6\% relative improvement on MAE. The RMSE of 1.363 remains competitive with MAGNet's 1.362 while delivering 4.3× greater training efficiency and 25\% reduced memory consumption compared to MAGNet.
+% Overall, CADGN strikes a good balance between computational efficiency and prediction accuracy, and is well suited for small-grained or finer grained EVCS load forecasting.
+
+% \hl{This section evaluates the computational efficiency of CADGN by comparing its inference time against the benchmark models.}
+
+% The experiments are conducted on a server equipped with an Intel Xeon E5-2690 CPU and an NVIDIA Tesla V100 GPU. The results are summarized in Table \ref{table:efficiency}. CADGN demonstrates competitive efficiency, with inference times comparable to the benchmark models. The model's efficiency is attributed to the parallel processing capabilities of the Graph Convolutional Network (GCN) layers, which leverage the GPU's computational power to accelerate graph-based operations. This efficiency is particularly advantageous for real-time applications, where rapid and accurate load predictions are essential for optimizing EVCS operations.
+
+\begin{table}[htbp]
+\centering
+\caption{\hl{Efficiency comparison of CADGN and benchmark models.}}
+	\vspace{-8pt}\resizebox{1\linewidth}{!}{
+	\begin{tabular}{clllcc}
+		\toprule
+		\toprule
+		\textbf{Model} & \multicolumn{1}{l}{\makecell[c]{\textbf{Training} \\ \textbf{time (s)}}} & \multicolumn{1}{l}{\makecell[c]{\textbf{GPU memory} \\  \textbf{usage (MB)}}} & \multicolumn{1}{l}{\makecell[c]{\textbf{Inference} \\ \textbf{time (s)}}} & \multicolumn{1}{l}{\textbf{MAE}} & \multicolumn{1}{l}{\textbf{RMSE}} \\
+		\midrule
+		Cross. & 0.139 (5.1$\times$)  & 5443 (3.4$\times$)  & 0.043 (2.1$\times$)  & 0.705  & 1.409   \\
+		PatchTST & 0.029 (1.1$\times$)  & 1795  (1.1$\times$) & \underline{0.005} (0.2$\times$)  & 0.667  & 1.376    \\
+		MAGNet & 0.108  (4.3$\times$) & 2113 (1.3$\times$) & 0.030 (1.4$\times$) & 0.656  & \textbf{1.362}    \\
+		AGCRN & 0.409 (16$\times$) & 2013 (1.3$\times$) & 0.171 (8.4$\times$) & 0.671  & 1.404    \\
+		GWN   & \textbf{0.009} (0.4$\times$) & 1619 (1.0$\times$) & \textbf{0.002} (0.1$\times$) & 0.699  & 1.370    \\
+		\hline
+		\cellcolor{tablegray}CADGN & \cellcolor{tablegray}\underline{0.025}  & \cellcolor{tablegray}\textbf{1585}  & \cellcolor{tablegray}0.020  & \cellcolor{tablegray}\textbf{0.644}  & \cellcolor{tablegray}\underline{1.363}  \\
+		\bottomrule
+		\bottomrule
+	\end{tabular}%
+	}
+\label{tab:efficiency}%
+\end{table}%
+
+
+\subsection{Illustration of Graph Learning Module Differences}
+
+\begin{figure}[t!]
+	\centering
+	\subfigure[CAGLM adjacency matrix]{\includegraphics[width=0.42\linewidth]{images/causal_adj.pdf}}~~
+	\subfigure[GRGLM adjacency matrix]{\includegraphics[width=0.42\linewidth]{images/pivotal_adj.pdf}}~~
+ 
+	~~\subfigure[GCN feature of CAGLM]{\includegraphics[width=0.42\linewidth]{images/causal_weighting.pdf}}~~
+	\subfigure[GCN feature of GRGLM]{\includegraphics[width=0.42\linewidth]{images/pivotal_weighting.pdf}}
+	\caption{Examples of adjacency matrices and GCN features for CAGLM and GRGLM.}
+	\label{figure:adj}
+	\vspace{-14pt}
+\end{figure}
+
+Fig. \ref{figure:adj} offers a visual comparison between the CAGLM and CRGLM, showcasing the contrasting nature of the learned graphs and their impact on feature representations. Fig. \ref{figure:adj}(a) and Fig. \ref{figure:adj}(b) depict the adjacency matrices for CAGLM and CRGLM, respectively. The sparsity of CAGLM’s adjacency matrix indicates its focus on representing specific and direct causal relationships. Conversely, the denser structure of CRGLM’s adjacency matrix reflects its role in capturing the broader influence of critical nodes on other EVCS within the network. Fig. \ref{figure:adj}(c) and Fig. \ref{figure:adj}(d) display the corresponding GCN features learned by each module. The heterogeneous patterns within CAGLM’s GCN feature map suggest the extraction of detailed and specific information, vital for representing nuanced causal dependencies. In contrast, the relatively uniform values in CRGLM's GCN feature map indicate the learning of general, global trends among the most influential nodes.
+
+These contrasting features highlight the complementary roles of the two modules: CAGLM focuses on precision and localized causal inference, while CRGLM aims for generalization and captures network-wide patterns driven by critical node dynamics. By fusing their respective representations, CADGN leverages a multifaceted understanding of the EVCS network to achieve superior prediction accuracy.
+
+% \subsection{Interpretability Analysis}
+% \label{subsec:interpretability}
+
+\subsection{\hl{Verification of Causality in EVCS Datasets}}
+ 
+\hl{To establish the presence of causal relationships in EVCS load data, we employ Granger causality tests \cite{granger1969investigating} to learn causal graph structures. Granger causality determines whether one time series provides statistically significant information for predicting another and is widely used in time-series analysis \cite{shojaie2022granger}. Fig. \ref{figure:causality_analysis}(a) illustrates the overall prevalence of causality in three EVCS datasets. Each dataset is partitioned into batches, and pairwise Granger causality tests are conducted on the first sample of each batch. Although the data segments in each batch are relatively small, a notable portion of causal links remain statistically significant. This suggests that meaningful causal dependencies exist within the EVCS load data, rather than being purely random fluctuations.}
+
+\hl{Due to the large number of stations in real-world EVCS datasets, which introduce intricate and indirect causal relationships that are difficult to present clearly, a synthetic case is used for better interpretability. To further demonstrate the capacity to detect causal effects in multi-station scenarios, Fig. \ref{figure:causality_analysis}(b) illustrates a synthetic case involving two clearly interpretable events. In Event 1, an external social activity near Station A increases its load, which subsequently influences the load at Station B. In Event 2, a local fault or maintenance at Station C causes a sudden load drop, prompting users to shift to Station D, thereby increasing its load.}
+
+\hl{These synthetic events are validated using Granger causality tests. Fig. \ref{figure:causality_analysis}(c) and Fig. \ref{figure:causality_analysis}(d) present the $p$-values for each station pair during Events 1 and 2, respectively.
+The highlighted low $p$-values confirm the hypothesized causal links (e.g., A $\rightarrow$ B for Event 1 and C $\rightarrow$ D for Event 2). Subsequently, we apply the proposed TFGES algorithm to learn the underlying causal graphs. Fig. \ref{figure:causality_analysis}(e) and Fig. \ref{figure:causality_analysis}(f) display the resulting graph structures and their causal scores, which align with the causal directions identified by the Granger tests. Overall, these results provide the evidence of latent causal relationships in EVCS load behavior. The alignment between the Granger causality tests and the learned causal graphs further validates the effectiveness of CADGN in capturing and leveraging causal dependencies for improved forecasting accuracy.}
+
+\begin{figure}[t!]
+	\centering
+	\subfigure[Variation of significant causality ratio across different datasets]{\includegraphics[width=0.95\linewidth]{images/significant.pdf}}
+
+	\subfigure[\hl{Synthetic case data}]{\includegraphics[width=0.95\linewidth]{images/causal_case.pdf}}
+
+	\subfigure[\hl{$p$-values from Granger Causality Tests for Event 1}]{\includegraphics[width=0.44\linewidth]{images/causal_event1.pdf}}~~
+	\subfigure[\hl{$p$-values from Granger Causality Tests for Event 2}]{\includegraphics[width=0.44\linewidth]{images/causal_event2.pdf}}
+
+
+	\subfigure[\hl{The causal graph and causal score learned by TFGES for Event 1}]{\includegraphics[width=0.35\linewidth]{images/structure_1.pdf}}~~~~~~
+	\subfigure[\hl{The causal graph and causal score learned by TFGES for Event 2}]{\includegraphics[width=0.35\linewidth]{images/structure_2.pdf}}
+
+	\caption{\hl{Causality analysis for three EVCS datasets and a synthetic case.}}
+	\label{figure:causality_analysis}
+	\vspace{-14pt}
+\end{figure}
+
+
+\subsection{\hl{Analysis of Adjacency Structures and Learned Feature Representations}}
+
+\begin{figure}[t!]
+	\centering
+	\subfigure[\hl{Significant $p$-value adjacency matrix from Granger causality}]{\includegraphics[width=0.43\linewidth]{images/significant_matrix_granger.pdf}}~~~~
+	\subfigure[\hl{$p$-value matrix from Granger causality}]{\includegraphics[width=0.46\linewidth]{images/granger_p_value_matrix.pdf}}
+
+	\subfigure[\hl{Adjacency matrix learned by the proposed TFGES method}]{\includegraphics[width=0.43\linewidth]{images/significant_matrix_causal.pdf}}~~~~
+	\subfigure[\hl{First-layer feature map from SGCN in CAGLM}]{\includegraphics[width=0.46\linewidth]{images/causal_gcn_out.pdf}}
+
+	\subfigure[\hl{Critical node adjacency matrix}]{\includegraphics[width=0.43\linewidth]{images/significant_matrix_corr.pdf}}~~~~
+	\subfigure[\hl{First-layer feature map from SGCN in CRGLM}]{\includegraphics[width=0.46\linewidth]{images/corr_gcn_out.pdf}}
+
+	\caption{\hl{Visualization of causal adjacency matrices and SGCN feature maps.}}
+	\label{figure:causal_adjacency}
+\end{figure}
+
+\hl{To evaluate the effectiveness of the proposed method in capturing meaningful causal relationships and refining feature representations, this part analyze both the adjacency structures and the learned feature maps. Fig. \ref{figure:causal_adjacency} presents a comparative visualization of adjacency matrices obtained through different methods and the corresponding feature representations learned by the graph-based models.}
+
+\hl{Fig. \ref{figure:causal_adjacency}(a) presents the adjacency matrix derived from statistically significant connections ($p < 0.05$) identified using Granger causality tests, while Fig. \ref{figure:causal_adjacency}(b) shows the corresponding matrix of $p$-values. The Granger-based approach captures a broad set of potential causal links, yet it tends to retain connections of marginal significance, leading to relatively dense adjacency structures. This density may introduce redundancy and increase model complexity, potentially affecting interpretability and computational efficiency.} 
+
+\hl{In contrast, Fig. \ref{figure:causal_adjacency}(c) illustrates the adjacency matrix obtained through the TFGES method, which employs a causal structure search strategy to construct a more refined and parsimonious graph. This sparser representation filters out weak connections, improving the efficiency of downstream learning tasks.}
+
+\hl{Fig. \ref{figure:causal_adjacency}(d) and Fig. \ref{figure:causal_adjacency}(f) depict the first-layer feature maps learned by the SGCN model under the CAGLM and CRGLM frameworks, respectively. In Fig. \ref{figure:causal_adjacency}(d), feature activations appear in regions where Granger causality previously assigned low significance, enhancing the effectiveness of the proposed method in refining causal structures. Meanwhile, Fig. \ref{figure:causal_adjacency}(f) highlights critical node regions that correspond closely with the adjacency matrix in Fig. \ref{figure:causal_adjacency}(e), demonstrating that CRGLM effectively prioritizes critical nodes in the EVCS network.}
+
+% \vspace{-5pt}
+\section{\hl{Discussion}}
+\label{section:discussion}
+
+\hl{The experimental results from Section \ref{section:case} provide comprehensive evidence that the proposed CADGN framework effectively addresses the challenges of multi-step EVCS load forecasting, offering enhanced accuracy, robustness, and interpretability compared to existing approaches. Several key observations can be highlighted:
+(1) CADGN consistently outperforms transformer-based time series models and GNN-based approaches across multiple datasets, demonstrating superior forecasting accuracy, particularly for mid-term horizons (6 and 12 hours). Compared to the best-performing baselines, CADGN achieves up to a 8.1\% reduction in MAPE, confirming its ability to capture both localized temporal dependencies and global network interactions. As forecasting horizons extend, all models exhibit declining accuracy, but CADGN remains more robust, with a notably smaller performance drop. (2) The ablation study confirms that CADGN’s key components contribute significantly to its performance. Removing CRGLM leads to the most substantial degradation, increasing MAE and RMSE by over 6\%, underscoring its critical role in dynamically modeling influential EVCS nodes. The exclusion of CAGLM also weakens performance, highlighting the necessity of causal inference in improving prediction accuracy. (3) Parameter sensitivity analysis reveals that excessively large temporal delay windows $ T_d > 2^3$ and critical node selection ratios $ R_k > 0.6 $ introduce redundant relationships, degrading both accuracy and efficiency. CADGN remains relatively stable across different data masking ratios, suggesting its resilience to missing data. (4) CADGN demonstrates strong forecasting robustness, effectively tracking sharp load fluctuations and peak demand variations. In the Korea dataset, which exhibits significant volatility, CADGN outperforms other models in capturing demand surges. (5) The computational efficiency of CADGN is also competitive, with training times 5.1× faster than Crossformer and 16× faster than AGCRN, while maintaining lower memory consumption due to CRGLM’s sparse graph representation. (6) Graph structure analysis confirms that CAGLM captures precise causal relationships, while CRGLM focuses on broader network dynamics. Granger causality tests validate that meaningful causal dependencies exist in EVCS load data, further supporting CADGN’s effectiveness in leveraging these relationships. Compared to dense adjacency structures obtained via direct statistical testing, CADGN’s refined causal graph representations improve interpretability and learning efficiency.
+Overall, the results demonstrate that CADGN effectively integrates causality awareness and dynamic node selection to enhance multi-step forecasting accuracy while maintaining a balance between efficiency and scalability. These advantages position CADGN as a robust solution for real-world EVCS load forecasting applications.}
+
+% \hl{The experimental results confirm the effectiveness of CADGN in multi-step EVCS load forecasting, consistently outperforming state-of-the-art models, particularly for mid- and long-term horizons. The ablation study highlights the critical role of CRGLM in capturing dynamic EVCS interactions and CAGLM in enhancing causal inference. Parameter sensitivity analyses reveal that careful tuning of temporal window size and critical node selection ratio is key to balancing accuracy and computational efficiency.
+% Moreover, CADGN efficiently balances accuracy and computational cost, demonstrating strong scalability for smart grid applications. Its ability to capture meaningful causal dependencies, validated through Granger causality tests and adjacency analysis, highlights the benefits of integrating causality-aware mechanisms with dynamic graph structures. These results verify that CADGN is a reliable and efficient approach for EVCS load forecasting.} 
+
+% \section{Conclusions and Future Work}
+\vspace{-5pt}
+\section{Conclusions}
+\label{section:conclusion}
+
+In this paper, we propose the Causality-Aware Dynamic Multi-Graph Convolutional Network (CADGN), a novel deep learning framework designed to improve EVCS load forecasting. CADGN addresses the limitations of traditional time-series and graph-based methods by incorporating two key modules: the Causality-Aware Graph Learning Module (CAGLM) and the Critical Relationship Graph Learning Module (CRGLM). CAGLM identifies cause-and-effect relationships among EVCS loads to extract informative representations, while CRGLM determines and models the dynamic relationships of critical EVCS based on a novel centrality scoring mechanism. A Temporal Representation Fusion Module (TRFM) integrates the spatial and temporal insights from these modules to provide accurate load predictions. Empirical evaluations on real-world datasets from diverse geographical locations demonstrated CADGN's superior performance across multiple forecasting horizons, often surpassing state-of-the-art baselines. The ablation study highlighted the importance of each module, particularly CRGLM, in achieving high accuracy. This work serves as a significant contribution toward developing more effective and insightful forecasting models to address the challenges associated with widespread EV adoption. By integrating deeper causal understanding and prioritizing the role of critical network interactions, approaches such as CADGN pave the way for developing more resilient and adaptable infrastructure ready to cope with the complexity of future electrified transportation systems.
+
+\hl{While CADGN demonstrates strong performance in EVCS load forecasting, there are still areas for improvement. First, the model faces challenges in predicting extreme load variations, particularly sudden spikes or drops in charging demand, which are inherently difficult to forecast due to the stochastic nature of EV charging behavior. Second, the causal graph construction and graph learning processes remain separate, inevitably increasing computational costs. Third, while CADGN captures causal relationships, it does not fully disentangle complex causal dependencies in EVCS load dynamics or trace them to specific influencing factors.}
+
+\hl{To address these limitations, we will explore extreme regression modeling and post-processing correction to enhance forecasting accuracy for rare but critical EVCS load fluctuations. To optimize causal discovery and graph learning simultaneously during training and reduce computational overhead, we plan to integrate neural causal inference. Additionally, we will investigate counterfactual analysis and attention-based causal discovery to better understand the causal mechanisms behind EV charging patterns and improve model interpretability.}
+
+
+% In this paper, we have presented the Causality-Aware Dynamic Multi-Graph Convolutional Network (CADGN), a novel deep learning framework tailored for enhanced EVCS load forecasting. Recognizing the shortcomings of conventional time-series and graph-based methods in capturing the full complexity of EVCS network interactions, CADGN introduces two core modules to achieve superior forecasting accuracy: the Causality-Aware Graph Learning Module (CAGLM) and the Critical Relationship Graph Learning Module (CRGLM). CAGLM infers underlying cause-and-effect relationships between EVCS loads to extract informative representations guided by these causal dependencies, while CRGLM first identifies influential (``critical") EVCS based on a novel centrality scoring mechanism and subsequently models their evolving relationships. A dedicated Temporal Representation Fusion Module (TRFM) effectively integrates these spatial and temporal insights from CAGLM and CRGLM, providing a robust and comprehensive input to generate accurate load predictions across diverse horizons.
+
+% Rigorous empirical evaluations, performed on real-world EVCS load datasets spanning diverse geographical areas (Boulder, USA, Palo Alto, USA, and South Korea), provided clear and compelling evidence of CADGN's effectiveness. Across multiple forecasting horizons, the model consistently matched or exceeded the accuracy of state-of-the-art baselines, highlighting the distinct value of integrating causality and critical node modeling. The ablation study underscored the contributions of individual modules, with the removal of CRGLM leading to particularly substantial performance degradation. These results demonstrate that CADGN’s principled focus on representing and learning from dynamic, causally informed interactions between critical EVCSs enables the model to grasp complex dependencies, particularly as networks expand and exhibit heterogeneous load characteristics.
+
+% The encouraging results obtained with CADGN provide a strong foundation for future investigations. One promising avenue is expanding CADGN by incorporating features like weather data, event-related information, or insights into EV user behavior. This richer context can contribute to higher forecast accuracy, leading to improved grid management strategies. Building on this, refining the critical EVCS node identification mechanisms within CRGLM offers another compelling research direction. Investigating alternative network centrality measures or incorporating the aforementioned external data sources into the node scoring process could reveal more robust sets of critical nodes, leading to even more precise load predictions for both grid planning and operation. Furthermore, enhancing CRGLM with an adaptive mechanism for dynamically adjusting critical node selection, perhaps based on real-time network behavior or by adapting the ($R_k$) threshold, could further capture evolving network dynamics for more adaptable load forecasting. Finally, equipping CADGN with the capacity to generate prediction intervals or probabilistic forecasts would offer valuable insights into the range of possible future loads, aiding decision-making processes for grid operation, charging infrastructure planning, and energy pricing mechanisms.
+
+% This work serves as a significant contribution toward developing more effective and insightful forecasting models to address the challenges associated with widespread EV adoption. By integrating deeper causal understanding and prioritizing the role of critical network interactions, approaches such as CADGN pave the way for developing more resilient and adaptable infrastructure ready to cope with the complexity of future electrified transportation systems.
+
+
+% \appendix
+
+\section*{Appendix A \\ Additional Experimental Results}
+\renewcommand{\thetable}{A\arabic{table}}
+\setcounter{table}{0}
+
+\begin{table}[htbp]
+	\centering
+	\caption{\hl{Performance comparison on Perth dataset.}}
+		\vspace{-10pt}\resizebox{1\linewidth}{!}{
+			\begin{tabular}{cccccccc}
+				\toprule
+				\toprule
+				\textbf{Steps} & \textbf{Metrics} & \textbf{Dlinear} & \textbf{PatchTST} & \textbf{MAGNet} & \textbf{AGCRN} & \textbf{GWN} & \cellcolor{tablegray}\textbf{CADGN} \\
+				\midrule
+				\multirow{3}[2]{*}{3} & MAE   & 2.876  & 2.853  & 2.731  & 2.827  & 2.713  & \cellcolor{tablegray}\textbf{2.662 } \\
+					  & RMSE  & 5.565  & 5.563  & 5.558  & 5.625  & 5.566  & \cellcolor{tablegray}\textbf{5.510 } \\
+					  & MAPE  & 10.305  & 10.043  & 8.714  & 9.689  & 8.515  & \cellcolor{tablegray}\textbf{8.082 } \\
+				\midrule
+				\multirow{3}[2]{*}{6} & MAE   & 2.927  & 2.902  & 2.798  & 3.042  & 2.841  & \cellcolor{tablegray}\textbf{2.700 } \\
+					  & RMSE  & 5.645  & 5.648  & 5.631  & 5.800  & 5.663  & \cellcolor{tablegray}\textbf{5.604 } \\
+					  & MAPE  & 10.539  & 10.188  & 9.193  & 11.490  & 8.872  & \cellcolor{tablegray}\textbf{8.110 } \\
+				\midrule
+				\multirow{3}[2]{*}{12} & MAE   & 2.916  & 2.970  & 2.824  & 3.086  & 2.812  & \cellcolor{tablegray}\textbf{2.747 } \\
+					  & RMSE  & 5.704  & 5.690  & 5.687  & 5.955  & 5.708  & \cellcolor{tablegray}\textbf{5.637 } \\
+					  & MAPE  & 10.116  & 10.863  & 9.266  & 11.227  & 9.090  & \cellcolor{tablegray}\textbf{8.587 } \\
+				\bottomrule
+				\bottomrule
+			\end{tabular}%
+		}
+	\label{tab:additional_Exp}%
+\end{table}%
+
+
+\hl{To further evaluate the effectiveness of CADGN, additional experiments were conducted using the Perth dataset\footnote{\url{https://data.pkc.gov.uk/datasets/}}, which contains EVCS load data from 13 stations in Perth, Australia. The dataset spans from January 1, 2017, to August 31, 2019, with an hourly frequency. While the number of stations is similar to that of the Korea dataset, the average load is significantly lower at 2.084 $kW$. However, the peak load (152.195 $kW$) is higher than that of the Korea dataset, indicating greater local fluctuations. In comparison, Boulder (USA) has more stations but lower peak loads, whereas PALO (USA) exhibits a more balanced load distribution. These regional variations influence charging behaviors, making Perth an ideal dataset for evaluating forecasting robustness under high-variability conditions. To ensure consistency in experimental comparisons, the dataset was processed using the same data organization procedures as the other three datasets.}
+
+\hl{The performance comparison on the Perth dataset is summarized in Table \ref{tab:additional_Exp}. CADGN consistently outperforms benchmark models across all forecasting horizons, achieving the lowest MAE, RMSE, and MAPE. Notably, CADGN achieves up to a 9\% improvement in MAPE, particularly outperforming both graph-based models and transformer-based models, highlighting its effectiveness in capturing causal dependencies and evolving critical relationships. Unlike baseline models, which exhibit increasing errors over longer forecasting horizons, CADGN maintains stable RMSE values, demonstrating its capability to capture both short-term fluctuations and long-term dependencies. These results further underscore CADGN's robustness and adaptability in handling diverse EVCS load patterns, making it a promising solution for real-world EVCS load forecasting applications.}
+
+
+\section*{Appendix B \\ Parameter Settings}
+
+\label{section:appendixA}
+
+\hl{The search space of hyper-parameters for CADGN and baseline methods is summarized in Table \ref{table:parameter_settings}. The hyper-parameters are optimized using grid search with a 5-fold cross-validation on the training set. The best hyper-parameters are selected based on the lowest MAE on the validation set.}
+
+% \begin{table}[htbp!]
+%     \centering
+%     \small
+%     \caption{Parameter settings of CADGN.}
+%     \resizebox{1\linewidth}{!}{
+%         \begin{tabular}{cccc}
+%         \toprule
+%         Parameter & Option range & Parameter & Option range \\
+%         \midrule
+%         GCN hidden dimension & \{$2^4, 2^5, 2^6$ \}    & GCN out channel & 1 \\
+%         Scale & $\{1,3,5,7,9\}$ & Kernel size & $\{3,5,7\}$ \\
+%         CNN out channels & $\{2^4, 2^5, 2^6, 2^7\}$ & Dropout rate& \{0.1, 0.3, 0.5\} \\
+%         \bottomrule
+%     \end{tabular}%
+%     }
+% \label{table:parameters}
+% \end{table}
+
+
+\begin{table}[t!]
+	\scriptsize
+	\centering
+	\caption{\hl{Hyper-parameter settings.} }
+	\label{table:parameter_settings}
+	\vspace{-10pt}\resizebox{1\columnwidth}{!}{
+		\begin{tabular}{c c c}
+			\toprule
+			\toprule
+			\textbf{Model} & \textbf{Parameter} & \textbf{Option range} \\ 
+			
+			\midrule
+			
+			GRU & \multirow{1}{*}{Hidden size} & \multirow{1}{*}{\{$2^4, 2^5, 2^6$ \}} \\
+			
+			
+			\midrule
+			
+			\multirow{2}{*}{Inf.} & Encoder layers  & 1-5 (1 per step) \\
+			\multirow{4}{*}{Cross.} & Decoder layers & 1-5 (1 per step) \\ 
+			\multirow{6}{*}{PatchTST} & Label length & 1-10 (1 per step) \\
+			~ & Hidden dimension & \{$2^4, 2^5, 2^6, 2^7, 2^8$ \} \\ 
+			~ & The numbers of heads & \{$2^2, 2^3, 2^4, 2^5$ \} \\
+			~ & Patch length &  2-24 (2 per step) \\
+			\midrule
+			
+			Dlinear & Decomposition kernel size & 3-15 (2 per step) \\
+			
+			\midrule
+			
+			\multirow{4}{*}{{NHiTS}} & The number of blocks & 1-5 (1 per step)	\\
+			~ & The layer number  & 1-3 (1 per step)	\\ 	
+			~ & Hidden dimension & \{ $2^4, 2^5, 2^6, 2^7, 2^8$ \} \\
+			~ & Pooling size & 2-8 (2 per step) \\ 
+			\midrule
+			
+			\multirow{5}{*}{GAIN} & Hidden dimension & \{$2^4, 2^5, 2^6, 2^7, 2^8$ \} \\
+			~ & The number of heads of GAT & \{$2^0, 2^1, 2^2, 2^3, 2^4$ \} \\
+			~ & GRU layer number & \{$2^0, 2^1, 2^2, 2^3, 2^4$ \} \\
+			~ & CNN kernel size& \{$2^4, 2^5, 2^6, 2^7$ \} \\
+			~ & CNN out channels size & \{$2^4, 2^5, 2^6, 2^7, 2^8$ \} \\
+			\multirow{3}{*}{MAGNet} & Label length  & 1-10 (1 per step)	\\ 
+			~ & Input channel size  & \{$2^2, 2^3, 2^4, 2^5, 2^6$ \}	\\
+			~ & Skip channel size & \{$2^2, 2^3, 2^4, 2^5, 2^6$ \}	\\
+			\multirow{2}{*}{{AGCRN}} & RNN units & \{$2^4, 2^5, 2^6, 2^7, 2^8$ \}	\\ 
+			~ & The layer number & 1-5 (1 per step)	\\ 
+			\multirow{2}{*}{{GWN}} & Dilation channel size & \{$2^4, 2^5, 2^6, 2^7, 2^8$ \}	\\ 
+			~ & Blocks number & 2-8 (2 per step) \\ 
+			\midrule
+			\multirow{6}{*}{CADGN} & Hidden dimension & \{$2^4, 2^5, 2^6, 2^7, 2^8$ \} \\
+			~ & GCN out channels size & \{$2^0, 2^1, 2^2, 2^3, 2^4$ \} \\
+			~ & GCN layer number & 1-3 (1 per step) \\
+			~ & Delay window & 1-6 (1 per step) \\
+			~ & Data mask ratio & 0.0-0.9 (0.1 per step) \\
+			~ & TopK selection ratio & 0.1-1.0 (0.1 per step) \\
+			\bottomrule
+			\bottomrule
+		\end{tabular}
+	}
+	\vspace{-10pt}
+\end{table}
+
+
+% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{a1.eps}}]{First A. Author} (M'76--SM'81--F'87) and all authors may include 
+	% biographies. Biographies are often not included in conference-related
+	% papers. This author became a Member (M) of IEEE in 1976, a Senior
+	% Member (SM) in 1981, and a Fellow (F) in 1987. The first paragraph may
+	% contain a place and/or date of birth (list place, then date). Next,
+	% the author's educational background is listed. The degrees should be
+	% listed with type of degree in what field, which institution, city,
+	% state, and country, and year the degree was earned. The author's major
+	% field of study should be lower-cased. 
+	
+	% The second paragraph uses the pronoun of the person (he or she) and not the 
+	% author's last name. It lists military and work experience, including summer 
+	% and fellowship jobs. Job titles are capitalized. The current job must have a 
+	% location; previous positions may be listed 
+	% without one. Information concerning previous publications may be included. 
+	% Try not to list more than three books or published articles. The format for 
+	% listing publishers of a book within the biography is: title of book 
+	% (publisher name, year) similar to a reference. Current and previous research 
+	% interests end the paragraph. The third paragraph begins with the author's 
+	% title and last name (e.g., Dr.\ Smith, Prof.\ Jones, Mr.\ Kajor, Ms.\ Hunter). 
+	% List any memberships in professional societies other than the IEEE. Finally, 
+	% list any awards and work for IEEE committees and publications. If a 
+	% photograph is provided, it should be of good quality, and 
+	% professional-looking. Following are two examples of an author's biography.
+	% \end{IEEEbiography}
+
+% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{a2.eps}}]{Second B. Author} was born in Greenwich Village, New York, NY, USA in 
+	% 1977. He received the B.S. and M.S. degrees in aerospace engineering from 
+	% the University of Virginia, Charlottesville, in 2001 and the Ph.D. degree in 
+	% mechanical engineering from Drexel University, Philadelphia, PA, in 2008.
+	
+	% From 2001 to 2004, he was a Research Assistant with the Princeton Plasma 
+	% Physics Laboratory. Since 2009, he has been an Assistant Professor with the 
+	% Mechanical Engineering Department, Texas A{\&}M University, College Station. 
+	% He is the author of three books, more than 150 articles, and more than 70 
+	% inventions. His research interests include high-pressure and high-density 
+	% nonthermal plasma discharge processes and applications, microscale plasma 
+	% discharges, discharges in liquids, spectroscopic diagnostics, plasma 
+	% propulsion, and innovation plasma applications. He is an Associate Editor of 
+	% the journal \emph{Earth, Moon, Planets}, and holds two patents. 
+	
+	% Dr. Author was a recipient of the International Association of Geomagnetism 
+	% and Aeronomy Young Scientist Award for Excellence in 2008, and the IEEE 
+	% Electromagnetic Compatibility Society Best Symposium Paper Award in 2011. 
+	% \end{IEEEbiography}
+
+% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{a3.eps}}]{Third C. Author, Jr.} (M'87) received the B.S. degree in mechanical 
+	% engineering from National Chung Cheng University, Chiayi, Taiwan, in 2004 
+	% and the M.S. degree in mechanical engineering from National Tsing Hua 
+	% University, Hsinchu, Taiwan, in 2006. He is currently pursuing the Ph.D. 
+	% degree in mechanical engineering at Texas A{\&}M University, College 
+	% Station, TX, USA.
+	
+	% From 2008 to 2009, he was a Research Assistant with the Institute of 
+	% Physics, Academia Sinica, Tapei, Taiwan. His research interest includes the 
+	% development of surface processing and biological/medical treatment 
+	% techniques using nonthermal atmospheric pressure plasmas, fundamental study 
+	% of plasma sources, and fabrication of micro- or nanostructured surfaces. 
+	
+	% Mr. Author's awards and honors include the Frew Fellowship (Australian 
+	% Academy of Science), the I. I. Rabi Prize (APS), the European Frequency and 
+	% Time Forum Award, the Carl Zeiss Research Award, the William F. Meggers 
+	% Award and the Adolph Lomb Medal (OSA).
+	% \end{IEEEbiography}
+
+% \vspace{-12pt}
+\bibliography{r1_energy_v8.bib}
+\bibliographystyle{IEEEtran}
+
+\end{document}

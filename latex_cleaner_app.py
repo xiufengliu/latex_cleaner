@@ -37,7 +37,7 @@ def show_progress_bar(duration):
             time.sleep(duration / 100.0)
 
 st.set_page_config(
-    page_title="Latex cleaner",
+    page_title="Latex Cleaner",
     page_icon="🧊",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -46,9 +46,6 @@ st.set_page_config(
         'About': "RE App, Developed by Xiufeng Liu"
     }
 )
-
-if 'cleaned_latex' not in st.session_state:
-    st.session_state.cleaned_latex = ''
 
 st.title("LaTeX Cleaner")
 st.write("""
@@ -67,60 +64,75 @@ with st.expander("LaTeX Cleaner", expanded=True):
     OUTPUT_DIR = os.path.join(BASE_DIR, 'tmp_latex_project_arXiv')
 
     latex_content = st.text_area("Paste your LaTeX code here:", height=400)
-    action = st.radio("Choose an action:", ["Clean LaTeX", "Convert to TXT", "Convert to HTML"])
+    deep_clean = st.checkbox("Deep Clean (keep only title, abstract, and main text)")
+    output_format = st.radio("Choose output format:", ["LaTeX", "TXT", "HTML"])
 
     if st.button("Submit"):
         try:
+            # Create temporary directories if they don't exist
             if not os.path.exists(TMP_DIR):
                 os.makedirs(TMP_DIR)
             if not os.path.exists(OUTPUT_DIR):
                 os.makedirs(OUTPUT_DIR)
 
+            # Write the input LaTeX to a temporary file
             with open(os.path.join(TMP_DIR, 'input.tex'), 'w') as f:
                 f.write(latex_content)
 
+            # Run the initial cleaning with arxiv_latex_cleaner
             args = make_args(input_folder=TMP_DIR, use_external_tikz=None)
             run_arxiv_cleaner(args)
 
+            # Read the cleaned LaTeX and remove excessive newlines
             with open(os.path.join(OUTPUT_DIR, 'input.tex'), 'r') as f:
                 cleaned_latex = f.read()
                 cleaned_latex = re.sub(r'\n{3,}', '\n', cleaned_latex)
-                st.session_state.cleaned_latex = cleaned_latex
-            
 
+            # Apply deep cleaning if selected
+            if deep_clean:
+                patterns = [r'\\appendix', r'\\bibliography\{', r'\\begin\{thebibliography\}']
+                lines = cleaned_latex.split('\n')
+                truncate_line = None
+                for i, line in enumerate(lines):
+                    if any(re.search(pattern, line) for pattern in patterns):
+                        truncate_line = i
+                        break
+                if truncate_line is not None:
+                    cleaned_latex = '\n'.join(lines[:truncate_line]) + '\n\\end{document}'
 
-            if action == "Convert to TXT":
+            # Write the final cleaned LaTeX to the output file
+            with open(os.path.join(OUTPUT_DIR, 'input.tex'), 'w') as f:
+                f.write(cleaned_latex)
+
+            # Process based on selected output format
+            if output_format == "LaTeX":
+                st.text_area("Cleaned LaTeX:", value=cleaned_latex, height=400)
+                st.download_button(label="Download", data=cleaned_latex, file_name="paper.tex", mime="text/plain")
+
+            elif output_format == "TXT":
                 subprocess.run(['pandoc', '-s', os.path.join(OUTPUT_DIR, 'input.tex'), '-o', os.path.join(OUTPUT_DIR, 'output.txt')])
                 with open(os.path.join(OUTPUT_DIR, 'output.txt'), 'r') as f:
                     plain_text = f.read()
                 st.text_area("Cleaned Text:", value=plain_text, height=400)
-                
                 st.download_button(label="Download", data=plain_text, file_name="paper.txt", mime="text/plain")
 
-            elif action == "Convert to HTML":
-                    # Step 1: Read the LaTeX file
+            elif output_format == "HTML":
+                # Modify LaTeX for HTML conversion
                 with open(os.path.join(OUTPUT_DIR, 'input.tex'), 'r') as f:
                     tex_content = f.read()
-                # Step 2: Replace the abstract environment with the section command
                 tex_content = tex_content.replace('\\begin{abstract}', '\\section{Abstract}')
-                tex_content = tex_content.replace('\\end{abstract}', '')               
-                # Write the modified content back to the LaTeX file
+                tex_content = tex_content.replace('\\end{abstract}', '')
                 with open(os.path.join(OUTPUT_DIR, 'input.tex'), 'w') as f:
                     f.write(tex_content)
-                # Step 3: Run Pandoc conversion
-                subprocess.run(['pandoc', '-s', os.path.join(OUTPUT_DIR, 'input.tex'), '-o', os.path.join(OUTPUT_DIR, 'output.html'), '--mathjax'])         
+                subprocess.run(['pandoc', '-s', os.path.join(OUTPUT_DIR, 'input.tex'), '-o', os.path.join(OUTPUT_DIR, 'output.html'), '--mathjax'])
                 with open(os.path.join(OUTPUT_DIR, 'output.html'), 'r') as f:
                     html_text = f.read()
                 st.text_area("Cleaned HTML:", value=html_text, height=400)
                 st.download_button(label="Download", data=html_text, file_name="paper.html", mime="text/html")
 
-            else:
-                st.text_area("Cleaned LaTeX:", value=st.session_state.cleaned_latex, height=400)
-                st.download_button(label="Download", data=st.session_state.cleaned_latex, file_name="paper.tex", mime="text/plain")
-
         except Exception as e:
             st.write("An error occurred:", str(e))
 
         finally:
+            # Clean up temporary directories
             clean_temp_dirs([TMP_DIR, OUTPUT_DIR])
-
